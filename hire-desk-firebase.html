@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hire Desk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FAF9F5; --paper-dim:#F2F0E8; --ink:#20241F; --ink-soft:#5B6058;
+    --hairline:#DBD6C9; --hairline-strong:#C6C0B0;
+    --hr:#3D4F7D; --hr-tint:#E9ECF4; --panel:#2F6F63; --panel-tint:#E7F1EE;
+    --mgr:#B9812E; --mgr-tint:#F7EEDC; --danger:#9A3B34; --danger-tint:#F5E7E5;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:'IBM Plex Sans',sans-serif;font-size:15px;line-height:1.5;}
+  h1,h2,h3{font-family:'Fraunces',serif;font-weight:600;margin:0;letter-spacing:-0.01em;}
+  button{font-family:inherit;cursor:pointer;}
+  input,select,textarea{font-family:inherit;font-size:14px;}
+  #auth-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;}
+  .auth-card{width:100%;max-width:420px;background:#fff;border:1px solid var(--hairline);padding:36px 32px;}
+  .auth-brand{display:flex;align-items:baseline;gap:8px;margin-bottom:4px;}
+  .auth-brand .mark{width:10px;height:10px;background:var(--ink);display:inline-block;}
+  .auth-tag{color:var(--ink-soft);font-size:13px;margin-bottom:28px;}
+  .field{margin-bottom:16px;}
+  .field label{display:block;font-size:12.5px;color:var(--ink-soft);margin-bottom:6px;}
+  .field input,.field select{width:100%;padding:10px 11px;border:1px solid var(--hairline-strong);background:var(--paper);}
+  .field input:focus{outline:2px solid var(--ink);outline-offset:1px;}
+  .role-pick{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+  .role-opt{border:1px solid var(--hairline-strong);padding:10px 6px;text-align:center;font-size:13px;background:var(--paper);}
+  .role-opt.active{border-color:var(--ink);background:var(--ink);color:#fff;}
+  .btn-primary{width:100%;background:var(--ink);color:#fff;border:none;padding:12px;font-size:14px;font-weight:600;margin-top:6px;}
+  .btn-primary[disabled]{opacity:0.5;cursor:not-allowed;}
+  .auth-switch{margin-top:18px;font-size:13px;color:var(--ink-soft);text-align:center;}
+  .auth-switch a{color:var(--ink);cursor:pointer;text-decoration:underline;}
+  .auth-error{background:var(--danger-tint);color:var(--danger);padding:9px 11px;font-size:13px;margin-bottom:14px;border-left:3px solid var(--danger);}
+  .auth-note{font-size:11.5px;color:var(--ink-soft);margin-top:18px;border-top:1px solid var(--hairline);padding-top:14px;}
+  #app-screen{display:none;min-height:100vh;}
+  .shell{display:flex;min-height:100vh;}
+  .rail{width:220px;flex-shrink:0;border-right:1px solid var(--hairline);padding:24px 0;display:flex;flex-direction:column;}
+  .rail-brand{padding:0 22px 20px;border-bottom:1px solid var(--hairline);margin-bottom:8px;}
+  .rail-brand .mark{width:9px;height:9px;background:var(--ink);display:inline-block;margin-right:7px;}
+  .rail-nav{padding:8px 12px;flex:1;}
+  .rail-nav button{display:block;width:100%;text-align:left;background:none;border:none;padding:10px 10px;font-size:14px;color:var(--ink-soft);margin-bottom:2px;}
+  .rail-nav button.active{background:var(--paper-dim);color:var(--ink);font-weight:600;}
+  .rail-nav button:hover:not(.active){background:var(--paper-dim);}
+  .rail-foot{padding:14px 22px;border-top:1px solid var(--hairline);}
+  .who{font-size:13px;font-weight:600;}
+  .badge{display:inline-block;font-size:10.5px;padding:2px 7px;margin-top:5px;font-weight:600;}
+  .badge.hr{background:var(--hr-tint);color:var(--hr);}
+  .badge.panel{background:var(--panel-tint);color:var(--panel);}
+  .badge.mgr{background:var(--mgr-tint);color:var(--mgr);}
+  .logout{margin-top:10px;background:none;border:none;font-size:12.5px;color:var(--ink-soft);text-decoration:underline;padding:0;}
+  .main{flex:1;padding:36px 44px;max-width:980px;}
+  .page-head{margin-bottom:26px;}
+  .page-head h1{font-size:26px;}
+  .page-head p{color:var(--ink-soft);font-size:13.5px;margin-top:6px;}
+  .stat-row{display:flex;border:1px solid var(--hairline);margin-bottom:28px;}
+  .stat{flex:1;padding:16px 20px;border-right:1px solid var(--hairline);}
+  .stat:last-child{border-right:none;}
+  .stat .n{font-family:'Fraunces',serif;font-size:28px;font-weight:600;}
+  .stat .l{font-size:12px;color:var(--ink-soft);margin-top:2px;}
+  .panel-box{border:1px solid var(--hairline);background:#fff;margin-bottom:24px;}
+  .panel-box-head{padding:14px 18px;border-bottom:1px solid var(--hairline);display:flex;justify-content:space-between;align-items:center;}
+  .panel-box-head h3{font-size:15px;}
+  .row-item{padding:14px 18px;border-bottom:1px solid var(--hairline);display:flex;justify-content:space-between;align-items:flex-start;gap:16px;}
+  .row-item:last-child{border-bottom:none;}
+  .row-empty{padding:24px 18px;color:var(--ink-soft);font-size:13.5px;font-style:italic;}
+  .row-title{font-weight:600;font-size:14px;}
+  .row-sub{font-size:12.5px;color:var(--ink-soft);margin-top:3px;line-height:1.5;}
+  .row-actions{display:flex;gap:8px;flex-shrink:0;}
+  .tag{font-size:10.5px;padding:3px 8px;font-weight:600;white-space:nowrap;}
+  .tag.pending{background:var(--mgr-tint);color:var(--mgr);}
+  .tag.approved{background:var(--panel-tint);color:var(--panel);}
+  .tag.rejected{background:var(--danger-tint);color:var(--danger);}
+  .tag.scheduled{background:var(--hr-tint);color:var(--hr);}
+  .tag.completed{background:#EDEDED;color:#555;}
+  .tag.offer_approved{background:var(--panel-tint);color:var(--panel);}
+  .tag.offer_rejected{background:var(--danger-tint);color:var(--danger);}
+  .btn-sm{border:1px solid var(--ink);background:#fff;padding:6px 12px;font-size:12.5px;font-weight:600;}
+  .btn-sm:hover{background:var(--ink);color:#fff;}
+  .btn-sm.solid{background:var(--ink);color:#fff;}
+  .btn-sm.ghost{border-color:var(--hairline-strong);color:var(--ink-soft);}
+  .btn-sm.danger{border-color:var(--danger);color:var(--danger);}
+  .btn-sm.danger:hover{background:var(--danger);color:#fff;}
+  .form-grid{padding:18px;display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .form-grid .full{grid-column:1/-1;}
+  .form-grid label{display:block;font-size:12px;color:var(--ink-soft);margin-bottom:5px;}
+  .form-grid input,.form-grid select,.form-grid textarea{width:100%;padding:9px 10px;border:1px solid var(--hairline-strong);background:var(--paper);}
+  .form-grid textarea{min-height:70px;resize:vertical;}
+  .form-foot{padding:14px 18px;border-top:1px solid var(--hairline);display:flex;justify-content:flex-end;gap:10px;}
+  .slot-chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--hairline-strong);padding:5px 10px;font-size:12.5px;margin:0 6px 6px 0;}
+  .slot-chip button{background:none;border:none;color:var(--danger);font-size:14px;line-height:1;padding:0;}
+  .mini-label{font-size:11px;color:var(--ink-soft);}
+  .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:11px 20px;font-size:13.5px;z-index:60;display:none;}
+  .empty-state{padding:50px 20px;text-align:center;color:var(--ink-soft);}
+  .empty-state h3{color:var(--ink);margin-bottom:6px;font-size:17px;}
+  .loading-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;color:var(--ink-soft);font-size:14px;}
+  @media (max-width:760px){
+    .shell{flex-direction:column;}
+    .rail{width:100%;flex-direction:row;align-items:center;padding:12px 16px;overflow-x:auto;}
+    .rail-brand,.rail-foot{display:none;}
+    .rail-nav{display:flex;padding:0;gap:4px;}
+    .main{padding:22px 18px;}
+    .form-grid{grid-template-columns:1fr;}
+    .stat-row{flex-wrap:wrap;}
+    .stat{min-width:45%;border-bottom:1px solid var(--hairline);}
+  }
+</style>
+</head>
+<body>
+
+<div id="loading-screen" class="loading-screen">Loading Hire Desk…</div>
+
+<div id="auth-screen" style="display:none;">
+  <div class="auth-card">
+    <div class="auth-brand"><span class="mark"></span><h1 style="font-size:20px;">Hire Desk</h1></div>
+    <div class="auth-tag" id="auth-tag">Sign in to your workspace</div>
+    <div id="auth-error" class="auth-error" style="display:none;"></div>
+
+    <div id="signin-form">
+      <div class="field"><label>Email</label><input type="email" id="si-email" placeholder="you@company.com"></div>
+      <div class="field"><label>Password</label><input type="password" id="si-pass"></div>
+      <button class="btn-primary" id="si-btn" onclick="doSignIn()">Sign in</button>
+      <div class="auth-switch">New here? <a onclick="toggleAuth('signup')">Create an account</a></div>
+    </div>
+
+    <div id="signup-form" style="display:none;">
+      <div class="field"><label>Full name</label><input type="text" id="su-name" placeholder="Jane Doe"></div>
+      <div class="field"><label>Company email</label><input type="email" id="su-email" placeholder="you@company.com"></div>
+      <div class="field"><label>Password</label><input type="password" id="su-pass" placeholder="At least 6 characters"></div>
+      <div class="field">
+        <label>You are a</label>
+        <div class="role-pick">
+          <div class="role-opt active" data-role="hr" onclick="pickRole('hr')">HR</div>
+          <div class="role-opt" data-role="panel" onclick="pickRole('panel')">Panel</div>
+          <div class="role-opt" data-role="manager" onclick="pickRole('manager')">Manager</div>
+        </div>
+      </div>
+      <button class="btn-primary" id="su-btn" onclick="doSignUp()">Create account</button>
+      <div class="auth-switch">Already have an account? <a onclick="toggleAuth('signin')">Sign in</a></div>
+    </div>
+    <div class="auth-note">Real Firebase authentication — passwords are hashed and managed by Firebase, not stored in this app's own data.</div>
+  </div>
+</div>
+
+<div id="app-screen">
+  <div class="shell">
+    <div class="rail">
+      <div class="rail-brand"><span class="mark"></span><strong>Hire Desk</strong></div>
+      <div class="rail-nav" id="rail-nav"></div>
+      <div class="rail-foot">
+        <div class="who" id="who-name"></div>
+        <span class="badge" id="who-badge"></span><br>
+        <button class="logout" onclick="doSignOut()">Sign out</button>
+      </div>
+    </div>
+    <div class="main" id="main"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+/* ============================================================
+   FIREBASE SETUP
+   ============================================================ */
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {
+  getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,
+  onAuthStateChanged, signOut
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {
+  getFirestore, doc, setDoc, getDoc, getDocs, addDoc, updateDoc,
+  collection, query
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDWKNup0MyiFJPhi_3uy3QY2VVhWgYPLy0",
+  authDomain: "hire-desk-f9c44.firebaseapp.com",
+  projectId: "hire-desk-f9c44",
+  storageBucket: "hire-desk-f9c44.firebasestorage.app",
+  messagingSenderId: "123809044017",
+  appId: "1:123809044017:web:92318f793d8a134a43a710"
+};
+const fbApp = initializeApp(firebaseConfig);
+const auth = getAuth(fbApp);
+const db = getFirestore(fbApp);
+
+// Set this to something like "acmecorp.com" to restrict sign-up to company emails.
+const ALLOWED_DOMAIN = null;
+
+let session = null;      // { uid, email, name, role }
+let signupRole = 'hr';
+let allUsers = [];        // cached users list for name lookups
+let allJobs = [];
+let allAvailability = [];
+let allInterviews = [];
+
+window.pickRole = function(r){
+  signupRole = r;
+  document.querySelectorAll('.role-opt').forEach(el=>el.classList.toggle('active', el.dataset.role===r));
+};
+window.toggleAuth = function(which){
+  document.getElementById('auth-error').style.display='none';
+  document.getElementById('signin-form').style.display = which==='signin' ? 'block':'none';
+  document.getElementById('signup-form').style.display = which==='signup' ? 'block':'none';
+  document.getElementById('auth-tag').textContent = which==='signin' ? 'Sign in to your workspace' : 'Set up your workspace account';
+};
+function authFail(msg){
+  const e = document.getElementById('auth-error');
+  e.textContent = msg; e.style.display='block';
+}
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.style.display = 'block';
+  clearTimeout(t._h); t._h = setTimeout(()=>t.style.display='none', 2600);
+}
+function esc(s){ return (s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function friendlyAuthError(err){
+  const code = err.code || '';
+  if(code.includes('email-already-in-use')) return 'An account with this email already exists.';
+  if(code.includes('weak-password')) return 'Password must be at least 6 characters.';
+  if(code.includes('invalid-email')) return 'Enter a valid email address.';
+  if(code.includes('user-not-found') || code.includes('wrong-password') || code.includes('invalid-credential')) return 'Email or password is incorrect.';
+  return err.message || 'Something went wrong.';
+}
+
+/* ============================================================
+   AUTH ACTIONS
+   ============================================================ */
+window.doSignUp = async function(){
+  const name = document.getElementById('su-name').value.trim();
+  const email = document.getElementById('su-email').value.trim().toLowerCase();
+  const pass = document.getElementById('su-pass').value;
+  if(!name || !email || !pass) return authFail('Fill in all fields.');
+  if(ALLOWED_DOMAIN && !email.endsWith('@'+ALLOWED_DOMAIN)) return authFail(`Use your @${ALLOWED_DOMAIN} email.`);
+  const btn = document.getElementById('su-btn'); btn.disabled = true; btn.textContent = 'Creating...';
+  try{
+    const cred = await createUserWithEmailAndPassword(auth, email, pass);
+    await setDoc(doc(db, 'users', cred.user.uid), { name, email, role: signupRole });
+    // onAuthStateChanged will pick this up and route into the app
+  }catch(err){
+    authFail(friendlyAuthError(err));
+  }
+  btn.disabled = false; btn.textContent = 'Create account';
+};
+window.doSignIn = async function(){
+  const email = document.getElementById('si-email').value.trim().toLowerCase();
+  const pass = document.getElementById('si-pass').value;
+  if(!email || !pass) return authFail('Enter your email and password.');
+  const btn = document.getElementById('si-btn'); btn.disabled = true; btn.textContent = 'Signing in...';
+  try{
+    await signInWithEmailAndPassword(auth, email, pass);
+  }catch(err){
+    authFail(friendlyAuthError(err));
+  }
+  btn.disabled = false; btn.textContent = 'Sign in';
+};
+window.doSignOut = async function(){
+  await signOut(auth);
+};
+
+onAuthStateChanged(auth, async (user) => {
+  document.getElementById('loading-screen').style.display = 'none';
+  if(user){
+    const snap = await getDoc(doc(db, 'users', user.uid));
+    if(snap.exists()){
+      const u = snap.data();
+      session = { uid: user.uid, email: u.email, name: u.name, role: u.role };
+      document.getElementById('auth-screen').style.display = 'none';
+      document.getElementById('app-screen').style.display = 'block';
+      await enterApp();
+    } else {
+      // Auth account exists but no profile doc — treat as signed out
+      await signOut(auth);
+    }
+  } else {
+    session = null;
+    document.getElementById('app-screen').style.display = 'none';
+    document.getElementById('auth-screen').style.display = 'flex';
+  }
+});
+
+/* ============================================================
+   FIRESTORE HELPERS
+   ============================================================ */
+async function loadAll(){
+  const [usersSnap, jobsSnap, availSnap, intSnap] = await Promise.all([
+    getDocs(collection(db, 'users')),
+    getDocs(collection(db, 'jobs')),
+    getDocs(collection(db, 'availability')),
+    getDocs(collection(db, 'interviews')),
+  ]);
+  allUsers = usersSnap.docs.map(d=>({ uid:d.id, ...d.data() }));
+  allJobs = jobsSnap.docs.map(d=>({ id:d.id, ...d.data() }));
+  allAvailability = availSnap.docs.map(d=>({ id:d.id, ...d.data() }));
+  allInterviews = intSnap.docs.map(d=>({ id:d.id, ...d.data() }));
+}
+function userName(uid){ const u = allUsers.find(x=>x.uid===uid); return u ? u.name : uid; }
+
+/* ============================================================
+   APP SHELL / ROUTING
+   ============================================================ */
+const NAV = {
+  hr:      [['jobs','Job posts'],['availability','Panel availability'],['schedule','Schedule interview'],['interviews','Interviews']],
+  panel:   [['openjobs','Open roles'],['myavail','My availability'],['myinterviews','My interviews'],['feedback','Give feedback']],
+  manager: [['approvals','Job approvals'],['offers','Offer approvals'],['reports','Reports']]
+};
+window.route = async function(key){
+  document.querySelectorAll('.rail-nav button').forEach(b=>b.classList.toggle('active', b.dataset.key===key));
+  await loadAll();
+  const renderers = {
+    jobs: renderHRJobs, availability: renderHRAvailability, schedule: renderHRSchedule, interviews: renderHRInterviews,
+    openjobs: renderPanelOpenJobs, myavail: renderPanelMyAvail, myinterviews: renderPanelInterviews, feedback: renderPanelFeedback,
+    approvals: renderMgrApprovals, offers: renderMgrOffers, reports: renderMgrReports
+  };
+  renderers[key]();
+};
+async function enterApp(){
+  document.getElementById('who-name').textContent = session.name;
+  const b = document.getElementById('who-badge');
+  b.textContent = session.role==='hr'?'HR':session.role==='panel'?'Panel Member':'Manager';
+  b.className = 'badge ' + (session.role==='hr'?'hr':session.role==='panel'?'panel':'mgr');
+  const nav = document.getElementById('rail-nav');
+  nav.innerHTML = '';
+  NAV[session.role].forEach(([key,label])=>{
+    const btn = document.createElement('button');
+    btn.textContent = label; btn.dataset.key = key;
+    btn.onclick = ()=>window.route(key);
+    nav.appendChild(btn);
+  });
+  await window.route(NAV[session.role][0][0]);
+}
+function pageHead(title, sub){ return `<div class="page-head"><h1>${title}</h1><p>${sub}</p></div>`; }
+function tagFor(status){
+  const labels = {pending:'Pending approval',approved:'Open',rejected:'Rejected',closed:'Closed',
+    scheduled:'Scheduled',completed:'Awaiting decision',offer_approved:'Offer approved',offer_rejected:'Offer declined'};
+  return `<span class="tag ${status}">${labels[status]||status}</span>`;
+}
+
+/* ============================================================
+   HR VIEWS
+   ============================================================ */
+function renderHRJobs(){
+  const open = allJobs.filter(j=>j.status==='approved').length;
+  const pending = allJobs.filter(j=>j.status==='pending').length;
+  document.getElementById('main').innerHTML = `
+    ${pageHead('Job posts','Create a requisition and send it for manager approval.')}
+    <div class="stat-row">
+      <div class="stat"><div class="n">${allJobs.length}</div><div class="l">Total posts</div></div>
+      <div class="stat"><div class="n">${open}</div><div class="l">Open</div></div>
+      <div class="stat"><div class="n">${pending}</div><div class="l">Awaiting approval</div></div>
+    </div>
+    <div class="panel-box">
+      <div class="panel-box-head"><h3>New job post</h3></div>
+      <div class="form-grid">
+        <div><label>Job title</label><input id="jf-title" placeholder="e.g. Backend Engineer"></div>
+        <div><label>Department</label><input id="jf-dept" placeholder="e.g. Engineering"></div>
+        <div class="full"><label>Description</label><textarea id="jf-desc" placeholder="What the role covers, level, key skills..."></textarea></div>
+      </div>
+      <div class="form-foot"><button class="btn-sm solid" onclick="createJob()">Submit for approval</button></div>
+    </div>
+    <div class="panel-box">
+      <div class="panel-box-head"><h3>All posts</h3></div>
+      <div>${renderJobRows(allJobs)}</div>
+    </div>`;
+}
+function renderJobRows(jobs){
+  if(!jobs.length) return `<div class="row-empty">No job posts yet.</div>`;
+  return jobs.slice().reverse().map(j=>`
+    <div class="row-item">
+      <div><div class="row-title">${esc(j.title)} <span style="font-weight:400;color:var(--ink-soft);">— ${esc(j.department)}</span></div>
+      <div class="row-sub">${esc(j.description||'')}</div></div>
+      <div class="row-actions">${tagFor(j.status)}</div>
+    </div>`).join('');
+}
+window.createJob = async function(){
+  const title = document.getElementById('jf-title').value.trim();
+  const dept = document.getElementById('jf-dept').value.trim();
+  const desc = document.getElementById('jf-desc').value.trim();
+  if(!title || !dept) return showToast('Add a title and department.');
+  await addDoc(collection(db,'jobs'), {title, department:dept, description:desc, status:'pending', createdBy:session.uid});
+  showToast('Sent for manager approval.'); window.route('jobs');
+};
+
+function renderHRAvailability(){
+  const approvedJobs = allJobs.filter(j=>j.status==='approved');
+  document.getElementById('main').innerHTML = `
+    ${pageHead('Panel availability','See the slots panel members have offered for each open role.')}
+    ${approvedJobs.length ? approvedJobs.map(j=>{
+      const slots = allAvailability.filter(a=>a.jobId===j.id && !a.booked);
+      return `<div class="panel-box">
+        <div class="panel-box-head"><h3>${esc(j.title)}</h3><span class="mini-label">${slots.length} open slot${slots.length===1?'':'s'}</span></div>
+        <div>${slots.length ? slots.map(s=>`<div class="row-item"><div><div class="row-title">${esc(userName(s.panelUid))}</div>
+          <div class="row-sub">${s.date} · ${s.time}</div></div></div>`).join('') : `<div class="row-empty">No availability submitted for this role yet.</div>`}</div>
+      </div>`;
+    }).join('') : `<div class="empty-state"><h3>No open roles yet</h3>Once a manager approves a job post, panel members can add availability for it.</div>`}
+  `;
+}
+
+function renderHRSchedule(){
+  const approvedJobs = allJobs.filter(j=>j.status==='approved');
+  document.getElementById('main').innerHTML = `
+    ${pageHead('Schedule an interview','Pick a role and book one of the available slots.')}
+    <div class="panel-box">
+      <div class="panel-box-head"><h3>New interview</h3></div>
+      <div class="form-grid">
+        <div><label>Candidate name</label><input id="sf-cand" placeholder="Full name"></div>
+        <div><label>Candidate email</label><input id="sf-candemail" placeholder="candidate@email.com"></div>
+        <div class="full"><label>Role</label>
+          <select id="sf-job" onchange="refreshSlotOptions()">
+            <option value="">Select a role...</option>
+            ${approvedJobs.map(j=>`<option value="${j.id}">${esc(j.title)} — ${esc(j.department)}</option>`).join('')}
+          </select>
+        </div>
+        <div class="full"><label>Available slot</label>
+          <select id="sf-slot"><option value="">Select a role first...</option></select>
+        </div>
+      </div>
+      <div class="form-foot"><button class="btn-sm solid" onclick="scheduleInterview()">Schedule interview</button></div>
+    </div>`;
+}
+window.refreshSlotOptions = function(){
+  const jobId = document.getElementById('sf-job').value;
+  const sel = document.getElementById('sf-slot');
+  const slots = allAvailability.filter(a=>a.jobId===jobId && !a.booked);
+  sel.innerHTML = slots.length
+    ? slots.map(s=>`<option value="${s.id}">${esc(userName(s.panelUid))} — ${s.date} · ${s.time}</option>`).join('')
+    : `<option value="">No slots available for this role</option>`;
+};
+window.scheduleInterview = async function(){
+  const cand = document.getElementById('sf-cand').value.trim();
+  const candEmail = document.getElementById('sf-candemail').value.trim();
+  const jobId = document.getElementById('sf-job').value;
+  const slotId = document.getElementById('sf-slot').value;
+  if(!cand || !jobId || !slotId) return showToast('Fill in candidate, role and a slot.');
+  const slot = allAvailability.find(a=>a.id===slotId);
+  if(!slot || slot.booked) return showToast('That slot is no longer available.');
+  await updateDoc(doc(db,'availability',slotId), {booked:true});
+  await addDoc(collection(db,'interviews'), {
+    jobId, candidateName:cand, candidateEmail:candEmail, panelUid:slot.panelUid,
+    date:slot.date, time:slot.time, status:'scheduled', feedback:null
+  });
+  showToast('Interview scheduled.'); window.route('schedule');
+};
+
+function renderHRInterviews(){
+  document.getElementById('main').innerHTML = `
+    ${pageHead('Interviews','Track progress and see panel feedback once submitted.')}
+    <div class="panel-box"><div>${
+      allInterviews.length ? allInterviews.slice().reverse().map(i=>{
+        const job = allJobs.find(j=>j.id===i.jobId);
+        return `<div class="row-item">
+          <div style="flex:1;">
+            <div class="row-title">${esc(i.candidateName)} <span style="font-weight:400;color:var(--ink-soft);">— ${job?esc(job.title):'—'}</span></div>
+            <div class="row-sub">Panel: ${esc(userName(i.panelUid))} · ${i.date} · ${i.time}</div>
+            ${i.feedback ? `<div class="row-sub" style="margin-top:8px;padding:10px;background:var(--paper-dim);">
+              <strong>Feedback:</strong> ${i.feedback.recommend==='yes'?'Recommends hire':'Does not recommend'} — "${esc(i.feedback.comments)}"</div>` : ''}
+          </div>${tagFor(i.status)}
+        </div>`;
+      }).join('') : `<div class="row-empty">No interviews scheduled yet.</div>`
+    }</div></div>`;
+}
+
+/* ============================================================
+   PANEL VIEWS
+   ============================================================ */
+function renderPanelOpenJobs(){
+  const jobs = allJobs.filter(j=>j.status==='approved');
+  document.getElementById('main').innerHTML = `
+    ${pageHead('Open roles','Add the times you can interview for a role.')}
+    ${jobs.length ? jobs.map(j=>{
+      const mySlots = allAvailability.filter(a=>a.jobId===j.id && a.panelUid===session.uid);
+      return `<div class="panel-box">
+        <div class="panel-box-head"><h3>${esc(j.title)}</h3><span class="mini-label">${esc(j.department)}</span></div>
+        <div style="padding:16px 18px;">
+          <div class="row-sub" style="margin-bottom:12px;">${esc(j.description||'')}</div>
+          <div style="margin-bottom:12px;">${mySlots.map(s=>`<span class="slot-chip">${s.date} · ${s.time} ${s.booked?'(booked)':''} ${!s.booked?`<button onclick="removeSlot('${s.id}')">✕</button>`:''}</span>`).join('') || '<span class="mini-label">No slots added yet.</span>'}</div>
+          <div style="display:flex;gap:8px;align-items:flex-end;">
+            <div><label class="mini-label">Date</label><br><input type="date" id="av-date-${j.id}" style="padding:8px;border:1px solid var(--hairline-strong);"></div>
+            <div><label class="mini-label">Time</label><br><input type="time" id="av-time-${j.id}" style="padding:8px;border:1px solid var(--hairline-strong);"></div>
+            <button class="btn-sm" onclick="addSlot('${j.id}')">Add slot</button>
+          </div>
+        </div>
+      </div>`;
+    }).join('') : `<div class="empty-state"><h3>No open roles right now</h3>Check back once HR has posted and a manager has approved a role.</div>`}
+  `;
+}
+window.addSlot = async function(jobId){
+  const date = document.getElementById(`av-date-${jobId}`).value;
+  const time = document.getElementById(`av-time-${jobId}`).value;
+  if(!date || !time) return showToast('Pick a date and time.');
+  await addDoc(collection(db,'availability'), {jobId, panelUid:session.uid, date, time, booked:false});
+  showToast('Availability added.'); window.route('openjobs');
+};
+window.removeSlot = async function(slotId){
+  await updateDoc(doc(db,'availability',slotId), {removed:true});
+  // Simplest safe approach without a delete import: mark removed and filter it out client-side.
+  allAvailability = allAvailability.filter(s=>s.id!==slotId);
+  showToast('Slot removed.');
+  if(document.querySelector('.page-head h1').textContent.includes('My availability')) renderPanelMyAvail();
+  else renderPanelOpenJobs();
+};
+
+function renderPanelMyAvail(){
+  const mine = allAvailability.filter(a=>a.panelUid===session.uid && !a.removed);
+  document.getElementById('main').innerHTML = `
+    ${pageHead('My availability','Every slot you\u2019ve offered, across all roles.')}
+    <div class="panel-box"><div>${
+      mine.length ? mine.map(s=>{
+        const job = allJobs.find(j=>j.id===s.jobId);
+        return `<div class="row-item"><div><div class="row-title">${job?esc(job.title):'—'}</div>
+          <div class="row-sub">${s.date} · ${s.time}</div></div>
+          ${s.booked ? `<span class="tag scheduled">Booked</span>` : `<button class="btn-sm ghost" onclick="removeSlot('${s.id}')">Remove</button>`}</div>`;
+      }).join('') : `<div class="row-empty">You haven't added any availability yet.</div>`
+    }</div></div>`;
+}
+
+function renderPanelInterviews(){
+  const mine = allInterviews.filter(i=>i.panelUid===session.uid);
+  document.getElementById('main').innerHTML = `
+    ${pageHead('My interviews','Interviews you\u2019re on the panel for.')}
+    <div class="panel-box"><div>${
+      mine.length ? mine.slice().reverse().map(i=>{
+        const job = allJobs.find(j=>j.id===i.jobId);
+        return `<div class="row-item"><div><div class="row-title">${esc(i.candidateName)} — ${job?esc(job.title):'—'}</div>
+          <div class="row-sub">${i.date} · ${i.time}</div></div>${tagFor(i.status)}</div>`;
+      }).join('') : `<div class="row-empty">No interviews scheduled yet.</div>`
+    }</div></div>`;
+}
+
+function renderPanelFeedback(){
+  const pending = allInterviews.filter(i=>i.panelUid===session.uid && i.status==='scheduled');
+  document.getElementById('main').innerHTML = `
+    ${pageHead('Give feedback','Interviews awaiting your write-up.')}
+    <div class="panel-box"><div>${
+      pending.length ? pending.map(i=>{
+        const job = allJobs.find(j=>j.id===i.jobId);
+        return `<div class="row-item" style="display:block;">
+          <div class="row-title" style="margin-bottom:10px;">${esc(i.candidateName)} — ${job?esc(job.title):'—'}</div>
+          <div class="form-grid" style="padding:0;">
+            <div class="full"><label>Recommendation</label>
+              <select id="fb-rec-${i.id}"><option value="yes">Recommend hire</option><option value="no">Do not recommend</option></select>
+            </div>
+            <div class="full"><label>Comments</label><textarea id="fb-com-${i.id}" placeholder="Notes on the interview..."></textarea></div>
+          </div>
+          <div style="margin-top:10px;"><button class="btn-sm solid" onclick="submitFeedback('${i.id}')">Submit feedback</button></div>
+        </div>`;
+      }).join('') : `<div class="row-empty">Nothing waiting on you right now.</div>`
+    }</div></div>`;
+}
+window.submitFeedback = async function(interviewId){
+  const recommend = document.getElementById(`fb-rec-${interviewId}`).value;
+  const comments = document.getElementById(`fb-com-${interviewId}`).value.trim();
+  await updateDoc(doc(db,'interviews',interviewId), {
+    feedback: { recommend, comments, by: session.uid }, status: 'completed'
+  });
+  showToast('Feedback submitted.'); window.route('feedback');
+};
+
+/* ============================================================
+   MANAGER VIEWS
+   ============================================================ */
+function renderMgrApprovals(){
+  const pending = allJobs.filter(j=>j.status==='pending');
+  document.getElementById('main').innerHTML = `
+    ${pageHead('Job approvals','Review new requisitions before they go live to panels.')}
+    <div class="panel-box"><div>${
+      pending.length ? pending.map(j=>`
+        <div class="row-item">
+          <div><div class="row-title">${esc(j.title)} — ${esc(j.department)}</div><div class="row-sub">${esc(j.description||'')}</div></div>
+          <div class="row-actions">
+            <button class="btn-sm solid" onclick="decideJob('${j.id}','approved')">Approve</button>
+            <button class="btn-sm danger" onclick="decideJob('${j.id}','rejected')">Reject</button>
+          </div>
+        </div>`).join('') : `<div class="row-empty">No job posts waiting on you.</div>`
+    }</div></div>`;
+}
+window.decideJob = async function(jobId, decision){
+  await updateDoc(doc(db,'jobs',jobId), {status: decision});
+  showToast(decision==='approved'?'Job post approved.':'Job post rejected.'); window.route('approvals');
+};
+
+function renderMgrOffers(){
+  const ready = allInterviews.filter(i=>i.status==='completed');
+  document.getElementById('main').innerHTML = `
+    ${pageHead('Offer approvals','Interviews with feedback, awaiting your final call.')}
+    <div class="panel-box"><div>${
+      ready.length ? ready.map(i=>{
+        const job = allJobs.find(j=>j.id===i.jobId);
+        return `<div class="row-item">
+          <div>
+            <div class="row-title">${esc(i.candidateName)} — ${job?esc(job.title):'—'}</div>
+            <div class="row-sub">Panel: ${esc(userName(i.panelUid))}</div>
+            <div class="row-sub" style="margin-top:8px;padding:10px;background:var(--paper-dim);">
+              ${i.feedback.recommend==='yes'?'Recommends hire':'Does not recommend'} — "${esc(i.feedback.comments)}"</div>
+          </div>
+          <div class="row-actions">
+            <button class="btn-sm solid" onclick="decideOffer('${i.id}','offer_approved')">Approve offer</button>
+            <button class="btn-sm danger" onclick="decideOffer('${i.id}','offer_rejected')">Decline</button>
+          </div>
+        </div>`;
+      }).join('') : `<div class="row-empty">Nothing awaiting a decision.</div>`
+    }</div></div>`;
+}
+window.decideOffer = async function(interviewId, decision){
+  await updateDoc(doc(db,'interviews',interviewId), {status: decision});
+  showToast('Decision recorded.'); window.route('offers');
+};
+
+function renderMgrReports(){
+  const jobsCount = allJobs.length, open = allJobs.filter(j=>j.status==='approved').length;
+  const interviewsCount = allInterviews.length, hired = allInterviews.filter(i=>i.status==='offer_approved').length;
+  document.getElementById('main').innerHTML = `
+    ${pageHead('Reports','A read-only view across the whole pipeline.')}
+    <div class="stat-row">
+      <div class="stat"><div class="n">${jobsCount}</div><div class="l">Job posts</div></div>
+      <div class="stat"><div class="n">${open}</div><div class="l">Open roles</div></div>
+      <div class="stat"><div class="n">${interviewsCount}</div><div class="l">Interviews</div></div>
+      <div class="stat"><div class="n">${hired}</div><div class="l">Offers approved</div></div>
+    </div>
+    <div class="panel-box"><div class="panel-box-head"><h3>All job posts</h3></div><div>${renderJobRows(allJobs)}</div></div>
+    <div class="panel-box"><div class="panel-box-head"><h3>All interviews</h3></div><div>${
+      allInterviews.length ? allInterviews.slice().reverse().map(i=>{
+        const job = allJobs.find(j=>j.id===i.jobId);
+        return `<div class="row-item"><div><div class="row-title">${esc(i.candidateName)} — ${job?esc(job.title):'—'}</div>
+          <div class="row-sub">${i.date} · ${i.time}</div></div>${tagFor(i.status)}</div>`;
+      }).join('') : `<div class="row-empty">No interviews yet.</div>`
+    }</div></div>`;
+}
+</script>
+</body>
+</html>
