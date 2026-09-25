@@ -6,6 +6,7 @@
 <title>Hire Desk</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <style>
   :root{
     --paper:#FAF9F5; --paper-dim:#F2F0E8; --ink:#20241F; --ink-soft:#5B6058;
@@ -19,7 +20,7 @@
   button{font-family:inherit;cursor:pointer;}
   input,select,textarea{font-family:inherit;font-size:14px;}
   #auth-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;}
-  .auth-card{width:100%;max-width:420px;background:#fff;border:1px solid var(--hairline);padding:36px 32px;}
+  .auth-card{width:100%;max-width:440px;background:#fff;border:1px solid var(--hairline);padding:36px 32px;}
   .auth-brand{display:flex;align-items:baseline;gap:8px;margin-bottom:4px;}
   .auth-brand .mark{width:10px;height:10px;background:var(--ink);display:inline-block;}
   .auth-tag{color:var(--ink-soft);font-size:13px;margin-bottom:28px;}
@@ -30,6 +31,9 @@
   .role-pick{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
   .role-opt{border:1px solid var(--hairline-strong);padding:10px 6px;text-align:center;font-size:13px;background:var(--paper);}
   .role-opt.active{border-color:var(--ink);background:var(--ink);color:#fff;}
+  .chk-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+  .chk-opt{display:flex;align-items:center;gap:6px;font-size:13px;border:1px solid var(--hairline-strong);padding:7px 8px;}
+  .chk-opt input{margin:0;}
   .btn-primary{width:100%;background:var(--ink);color:#fff;border:none;padding:12px;font-size:14px;font-weight:600;margin-top:6px;}
   .btn-primary[disabled]{opacity:0.5;cursor:not-allowed;}
   .auth-switch{margin-top:18px;font-size:13px;color:var(--ink-soft);text-align:center;}
@@ -52,12 +56,12 @@
   .badge.panel{background:var(--panel-tint);color:var(--panel);}
   .badge.mgr{background:var(--mgr-tint);color:var(--mgr);}
   .logout{margin-top:10px;background:none;border:none;font-size:12.5px;color:var(--ink-soft);text-decoration:underline;padding:0;}
-  .main{flex:1;padding:36px 44px;max-width:980px;}
+  .main{flex:1;padding:36px 44px;max-width:1020px;}
   .page-head{margin-bottom:26px;}
   .page-head h1{font-size:26px;}
   .page-head p{color:var(--ink-soft);font-size:13.5px;margin-top:6px;}
-  .stat-row{display:flex;border:1px solid var(--hairline);margin-bottom:28px;}
-  .stat{flex:1;padding:16px 20px;border-right:1px solid var(--hairline);}
+  .stat-row{display:flex;border:1px solid var(--hairline);margin-bottom:28px;flex-wrap:wrap;}
+  .stat{flex:1;min-width:120px;padding:16px 20px;border-right:1px solid var(--hairline);border-bottom:1px solid var(--hairline);}
   .stat:last-child{border-right:none;}
   .stat .n{font-family:'Fraunces',serif;font-size:28px;font-weight:600;}
   .stat .l{font-size:12px;color:var(--ink-soft);margin-top:2px;}
@@ -69,15 +73,17 @@
   .row-empty{padding:24px 18px;color:var(--ink-soft);font-size:13.5px;font-style:italic;}
   .row-title{font-weight:600;font-size:14px;}
   .row-sub{font-size:12.5px;color:var(--ink-soft);margin-top:3px;line-height:1.5;}
-  .row-actions{display:flex;gap:8px;flex-shrink:0;}
+  .row-actions{display:flex;gap:8px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end;}
   .tag{font-size:10.5px;padding:3px 8px;font-weight:600;white-space:nowrap;}
   .tag.pending{background:var(--mgr-tint);color:var(--mgr);}
   .tag.approved{background:var(--panel-tint);color:var(--panel);}
   .tag.rejected{background:var(--danger-tint);color:var(--danger);}
+  .tag.closed{background:#EDEDED;color:#555;}
   .tag.scheduled{background:var(--hr-tint);color:var(--hr);}
   .tag.completed{background:#EDEDED;color:#555;}
   .tag.offer_approved{background:var(--panel-tint);color:var(--panel);}
   .tag.offer_rejected{background:var(--danger-tint);color:var(--danger);}
+  .chip{display:inline-block;font-size:10.5px;padding:2px 8px;border:1px solid var(--hairline-strong);margin:0 4px 4px 0;color:var(--ink-soft);}
   .btn-sm{border:1px solid var(--ink);background:#fff;padding:6px 12px;font-size:12.5px;font-weight:600;}
   .btn-sm:hover{background:var(--ink);color:#fff;}
   .btn-sm.solid{background:var(--ink);color:#fff;}
@@ -89,14 +95,24 @@
   .form-grid label{display:block;font-size:12px;color:var(--ink-soft);margin-bottom:5px;}
   .form-grid input,.form-grid select,.form-grid textarea{width:100%;padding:9px 10px;border:1px solid var(--hairline-strong);background:var(--paper);}
   .form-grid textarea{min-height:70px;resize:vertical;}
-  .form-foot{padding:14px 18px;border-top:1px solid var(--hairline);display:flex;justify-content:flex-end;gap:10px;}
+  .form-foot{padding:14px 18px;border-top:1px solid var(--hairline);display:flex;justify-content:space-between;align-items:center;gap:10px;}
   .slot-chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--hairline-strong);padding:5px 10px;font-size:12.5px;margin:0 6px 6px 0;}
   .slot-chip button{background:none;border:none;color:var(--danger);font-size:14px;line-height:1;padding:0;}
   .mini-label{font-size:11px;color:var(--ink-soft);}
-  .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:11px 20px;font-size:13.5px;z-index:60;display:none;}
+  .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:11px 20px;font-size:13.5px;z-index:60;display:none;max-width:80vw;}
   .empty-state{padding:50px 20px;text-align:center;color:var(--ink-soft);}
   .empty-state h3{color:var(--ink);margin-bottom:6px;font-size:17px;}
   .loading-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;color:var(--ink-soft);font-size:14px;}
+  .modal-bg{display:none;position:fixed;inset:0;background:rgba(32,36,31,0.45);align-items:center;justify-content:center;z-index:80;padding:20px;}
+  .modal{background:#fff;width:100%;max-width:480px;max-height:80vh;overflow-y:auto;border:1px solid var(--hairline);}
+  .modal-head{padding:16px 20px;border-bottom:1px solid var(--hairline);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:#fff;}
+  .modal-head h3{font-size:16px;}
+  .modal-close{background:none;border:none;font-size:20px;color:var(--ink-soft);line-height:1;}
+  .modal-body{padding:0;}
+  .timeline-item{padding:12px 20px;border-bottom:1px solid var(--hairline);font-size:13px;}
+  .timeline-item:last-child{border-bottom:none;}
+  .timeline-item .t-when{font-size:11px;color:var(--ink-soft);margin-top:2px;}
+  select[multiple]{height:auto;}
   @media (max-width:760px){
     .shell{flex-direction:column;}
     .rail{width:100%;flex-direction:row;align-items:center;padding:12px 16px;overflow-x:auto;}
@@ -104,8 +120,6 @@
     .rail-nav{display:flex;padding:0;gap:4px;}
     .main{padding:22px 18px;}
     .form-grid{grid-template-columns:1fr;}
-    .stat-row{flex-wrap:wrap;}
-    .stat{min-width:45%;border-bottom:1px solid var(--hairline);}
   }
 </style>
 </head>
@@ -138,10 +152,14 @@
           <div class="role-opt" data-role="manager" onclick="pickRole('manager')">Manager</div>
         </div>
       </div>
+      <div class="field" id="techstack-field" style="display:none;">
+        <label>Your tech stack(s)</label>
+        <div class="chk-grid" id="techstack-checks"></div>
+      </div>
       <button class="btn-primary" id="su-btn" onclick="doSignUp()">Create account</button>
       <div class="auth-switch">Already have an account? <a onclick="toggleAuth('signin')">Sign in</a></div>
     </div>
-    <div class="auth-note">Real Firebase authentication — passwords are hashed and managed by Firebase, not stored in this app's own data.</div>
+    <div class="auth-note">Your manager will be assigned by HR after you sign up — you'll see it reflected under Team once set.</div>
   </div>
 </div>
 
@@ -161,11 +179,12 @@
 </div>
 
 <div class="toast" id="toast"></div>
+<div class="modal-bg" id="modal-bg"><div class="modal">
+  <div class="modal-head"><h3 id="modal-title"></h3><button class="modal-close" onclick="closeModal()">✕</button></div>
+  <div class="modal-body" id="modal-body"></div>
+</div></div>
 
 <script type="module">
-/* ============================================================
-   FIREBASE SETUP
-   ============================================================ */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import {
   getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,
@@ -173,7 +192,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import {
   getFirestore, doc, setDoc, getDoc, getDocs, addDoc, updateDoc,
-  collection, query
+  collection, arrayUnion
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -188,36 +207,71 @@ const fbApp = initializeApp(firebaseConfig);
 const auth = getAuth(fbApp);
 const db = getFirestore(fbApp);
 
-// Set this to something like "acmecorp.com" to restrict sign-up to company emails.
-const ALLOWED_DOMAIN = null;
+const ALLOWED_DOMAIN = null; // set to e.g. "acmecorp.com" to restrict sign-up later
 
-let session = null;      // { uid, email, name, role }
+/* ---- Fill these in once EmailJS is set up. Until then, emails just log quietly. ---- */
+const EMAILJS_SERVICE_ID = 'service_lrdsms7';
+const EMAILJS_TEMPLATE_ID = 'template_8kf6gi9';
+const EMAILJS_PUBLIC_KEY = 'EP-NpCfAka0joXE4y';
+let emailjsReady = false;
+if (EMAILJS_PUBLIC_KEY && window.emailjs) { window.emailjs.init(EMAILJS_PUBLIC_KEY); emailjsReady = true; }
+async function sendNotification(toEmail, toName, subject, message){
+  if(!toEmail) return;
+  if(!emailjsReady){ console.log('[Email not sent — EmailJS not configured yet]', {toEmail, subject, message}); return; }
+  try{
+    await window.emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+      to_email: toEmail, to_name: toName || '', subject, message, app_link: window.location.href
+    });
+  }catch(e){ console.error('Email send failed', e); }
+}
+
+const TECH_STACKS = ['Backend','Frontend','Fullstack','Data/ML','QA','DevOps','Mobile','Other'];
+
+let session = null;
 let signupRole = 'hr';
-let allUsers = [];        // cached users list for name lookups
-let allJobs = [];
-let allAvailability = [];
-let allInterviews = [];
+let allUsers = [], allJobs = [], allAvailability = [], allInterviews = [];
+let draftDates = []; // building a job's available-dates list before submit
 
+/* ============================================================
+   UTIL
+   ============================================================ */
+function esc(s){ return (s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function showToast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.style.display='block'; clearTimeout(t._h); t._h=setTimeout(()=>t.style.display='none',2800); }
+function userByUid(uid){ return allUsers.find(u=>u.uid===uid); }
+function historyEntry(event){ return { event, byUid: session.uid, byName: session.name, at: new Date().toISOString() }; }
+function fmtWhen(iso){ try{ return new Date(iso).toLocaleString(); }catch(e){ return iso; } }
+window.closeModal = function(){ document.getElementById('modal-bg').style.display='none'; };
+function openModal(title, bodyHtml){
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-body').innerHTML = bodyHtml;
+  document.getElementById('modal-bg').style.display = 'flex';
+}
+window.viewTimeline = function(jobId){
+  const job = allJobs.find(j=>j.id===jobId);
+  const hist = (job.history||[]).slice().reverse();
+  openModal('Job timeline — ' + job.title, hist.length ? hist.map(h=>`
+    <div class="timeline-item"><div>${esc(h.event)}</div><div class="t-when">${esc(h.byName)} · ${fmtWhen(h.at)}</div></div>
+  `).join('') : `<div class="row-empty">No history yet.</div>`);
+};
+
+/* ============================================================
+   AUTH
+   ============================================================ */
 window.pickRole = function(r){
   signupRole = r;
   document.querySelectorAll('.role-opt').forEach(el=>el.classList.toggle('active', el.dataset.role===r));
+  document.getElementById('techstack-field').style.display = r==='panel' ? 'block' : 'none';
 };
+document.getElementById('techstack-checks').innerHTML = TECH_STACKS.map(t=>`
+  <label class="chk-opt"><input type="checkbox" value="${t}" class="ts-check"> ${t}</label>`).join('');
+
 window.toggleAuth = function(which){
   document.getElementById('auth-error').style.display='none';
   document.getElementById('signin-form').style.display = which==='signin' ? 'block':'none';
   document.getElementById('signup-form').style.display = which==='signup' ? 'block':'none';
   document.getElementById('auth-tag').textContent = which==='signin' ? 'Sign in to your workspace' : 'Set up your workspace account';
 };
-function authFail(msg){
-  const e = document.getElementById('auth-error');
-  e.textContent = msg; e.style.display='block';
-}
-function showToast(msg){
-  const t = document.getElementById('toast');
-  t.textContent = msg; t.style.display = 'block';
-  clearTimeout(t._h); t._h = setTimeout(()=>t.style.display='none', 2600);
-}
-function esc(s){ return (s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function authFail(msg){ const e=document.getElementById('auth-error'); e.textContent=msg; e.style.display='block'; }
 function friendlyAuthError(err){
   const code = err.code || '';
   if(code.includes('email-already-in-use')) return 'An account with this email already exists.';
@@ -227,113 +281,98 @@ function friendlyAuthError(err){
   return err.message || 'Something went wrong.';
 }
 
-/* ============================================================
-   AUTH ACTIONS
-   ============================================================ */
 window.doSignUp = async function(){
   const name = document.getElementById('su-name').value.trim();
   const email = document.getElementById('su-email').value.trim().toLowerCase();
   const pass = document.getElementById('su-pass').value;
   if(!name || !email || !pass) return authFail('Fill in all fields.');
   if(ALLOWED_DOMAIN && !email.endsWith('@'+ALLOWED_DOMAIN)) return authFail(`Use your @${ALLOWED_DOMAIN} email.`);
-  const btn = document.getElementById('su-btn'); btn.disabled = true; btn.textContent = 'Creating...';
+  const techStacks = signupRole==='panel' ? Array.from(document.querySelectorAll('.ts-check:checked')).map(c=>c.value) : [];
+  if(signupRole==='panel' && !techStacks.length) return authFail('Select at least one tech stack.');
+  const btn = document.getElementById('su-btn'); btn.disabled=true; btn.textContent='Creating...';
   try{
     const cred = await createUserWithEmailAndPassword(auth, email, pass);
-    await setDoc(doc(db, 'users', cred.user.uid), { name, email, role: signupRole });
-    // onAuthStateChanged will pick this up and route into the app
-  }catch(err){
-    authFail(friendlyAuthError(err));
-  }
-  btn.disabled = false; btn.textContent = 'Create account';
+    await setDoc(doc(db,'users',cred.user.uid), { name, email, role:signupRole, managerUid:null, techStacks });
+  }catch(err){ authFail(friendlyAuthError(err)); }
+  btn.disabled=false; btn.textContent='Create account';
 };
 window.doSignIn = async function(){
   const email = document.getElementById('si-email').value.trim().toLowerCase();
   const pass = document.getElementById('si-pass').value;
   if(!email || !pass) return authFail('Enter your email and password.');
-  const btn = document.getElementById('si-btn'); btn.disabled = true; btn.textContent = 'Signing in...';
-  try{
-    await signInWithEmailAndPassword(auth, email, pass);
-  }catch(err){
-    authFail(friendlyAuthError(err));
-  }
-  btn.disabled = false; btn.textContent = 'Sign in';
+  const btn = document.getElementById('si-btn'); btn.disabled=true; btn.textContent='Signing in...';
+  try{ await signInWithEmailAndPassword(auth, email, pass); }
+  catch(err){ authFail(friendlyAuthError(err)); }
+  btn.disabled=false; btn.textContent='Sign in';
 };
-window.doSignOut = async function(){
-  await signOut(auth);
-};
+window.doSignOut = async function(){ await signOut(auth); };
 
 onAuthStateChanged(auth, async (user) => {
   document.getElementById('loading-screen').style.display = 'none';
   if(user){
-    const snap = await getDoc(doc(db, 'users', user.uid));
+    const snap = await getDoc(doc(db,'users',user.uid));
     if(snap.exists()){
       const u = snap.data();
-      session = { uid: user.uid, email: u.email, name: u.name, role: u.role };
-      document.getElementById('auth-screen').style.display = 'none';
-      document.getElementById('app-screen').style.display = 'block';
+      session = { uid:user.uid, email:u.email, name:u.name, role:u.role, managerUid:u.managerUid||null, techStacks:u.techStacks||[] };
+      document.getElementById('auth-screen').style.display='none';
+      document.getElementById('app-screen').style.display='block';
       await enterApp();
-    } else {
-      // Auth account exists but no profile doc — treat as signed out
-      await signOut(auth);
-    }
+    } else { await signOut(auth); }
   } else {
     session = null;
-    document.getElementById('app-screen').style.display = 'none';
-    document.getElementById('auth-screen').style.display = 'flex';
+    document.getElementById('app-screen').style.display='none';
+    document.getElementById('auth-screen').style.display='flex';
   }
 });
 
 /* ============================================================
-   FIRESTORE HELPERS
+   DATA LOAD
    ============================================================ */
 async function loadAll(){
   const [usersSnap, jobsSnap, availSnap, intSnap] = await Promise.all([
-    getDocs(collection(db, 'users')),
-    getDocs(collection(db, 'jobs')),
-    getDocs(collection(db, 'availability')),
-    getDocs(collection(db, 'interviews')),
+    getDocs(collection(db,'users')), getDocs(collection(db,'jobs')),
+    getDocs(collection(db,'availability')), getDocs(collection(db,'interviews')),
   ]);
-  allUsers = usersSnap.docs.map(d=>({ uid:d.id, ...d.data() }));
-  allJobs = jobsSnap.docs.map(d=>({ id:d.id, ...d.data() }));
-  allAvailability = availSnap.docs.map(d=>({ id:d.id, ...d.data() }));
-  allInterviews = intSnap.docs.map(d=>({ id:d.id, ...d.data() }));
+  allUsers = usersSnap.docs.map(d=>({uid:d.id, ...d.data()}));
+  allJobs = jobsSnap.docs.map(d=>({id:d.id, ...d.data()}));
+  allAvailability = availSnap.docs.map(d=>({id:d.id, ...d.data()})).filter(a=>!a.removed);
+  allInterviews = intSnap.docs.map(d=>({id:d.id, ...d.data()}));
+  // keep session's own live copy in sync (e.g. manager assignment changes)
+  const me = allUsers.find(u=>u.uid===session.uid);
+  if(me){ session.managerUid = me.managerUid||null; session.techStacks = me.techStacks||[]; }
 }
-function userName(uid){ const u = allUsers.find(x=>x.uid===uid); return u ? u.name : uid; }
 
 /* ============================================================
-   APP SHELL / ROUTING
+   SHELL / ROUTING
    ============================================================ */
 const NAV = {
-  hr:      [['jobs','Job posts'],['availability','Panel availability'],['schedule','Schedule interview'],['interviews','Interviews']],
+  hr:      [['jobs','Job posts'],['availability','Panel availability'],['schedule','Schedule interview'],['interviews','Interviews'],['team','Team & managers']],
   panel:   [['openjobs','Open roles'],['myavail','My availability'],['myinterviews','My interviews'],['feedback','Give feedback']],
   manager: [['approvals','Job approvals'],['offers','Offer approvals'],['reports','Reports']]
 };
 window.route = async function(key){
   document.querySelectorAll('.rail-nav button').forEach(b=>b.classList.toggle('active', b.dataset.key===key));
   await loadAll();
-  const renderers = {
-    jobs: renderHRJobs, availability: renderHRAvailability, schedule: renderHRSchedule, interviews: renderHRInterviews,
-    openjobs: renderPanelOpenJobs, myavail: renderPanelMyAvail, myinterviews: renderPanelInterviews, feedback: renderPanelFeedback,
-    approvals: renderMgrApprovals, offers: renderMgrOffers, reports: renderMgrReports
+  const r = {
+    jobs:renderHRJobs, availability:renderHRAvailability, schedule:renderHRSchedule, interviews:renderHRInterviews, team:renderHRTeam,
+    openjobs:renderPanelOpenJobs, myavail:renderPanelMyAvail, myinterviews:renderPanelInterviews, feedback:renderPanelFeedback,
+    approvals:renderMgrApprovals, offers:renderMgrOffers, reports:renderMgrReports
   };
-  renderers[key]();
+  r[key]();
 };
 async function enterApp(){
   document.getElementById('who-name').textContent = session.name;
   const b = document.getElementById('who-badge');
   b.textContent = session.role==='hr'?'HR':session.role==='panel'?'Panel Member':'Manager';
   b.className = 'badge ' + (session.role==='hr'?'hr':session.role==='panel'?'panel':'mgr');
-  const nav = document.getElementById('rail-nav');
-  nav.innerHTML = '';
+  const nav = document.getElementById('rail-nav'); nav.innerHTML='';
   NAV[session.role].forEach(([key,label])=>{
-    const btn = document.createElement('button');
-    btn.textContent = label; btn.dataset.key = key;
-    btn.onclick = ()=>window.route(key);
-    nav.appendChild(btn);
+    const btn=document.createElement('button'); btn.textContent=label; btn.dataset.key=key;
+    btn.onclick=()=>window.route(key); nav.appendChild(btn);
   });
   await window.route(NAV[session.role][0][0]);
 }
-function pageHead(title, sub){ return `<div class="page-head"><h1>${title}</h1><p>${sub}</p></div>`; }
+function pageHead(t,s){ return `<div class="page-head"><h1>${t}</h1><p>${s}</p></div>`; }
 function tagFor(status){
   const labels = {pending:'Pending approval',approved:'Open',rejected:'Rejected',closed:'Closed',
     scheduled:'Scheduled',completed:'Awaiting decision',offer_approved:'Offer approved',offer_rejected:'Offer declined'};
@@ -341,13 +380,15 @@ function tagFor(status){
 }
 
 /* ============================================================
-   HR VIEWS
+   HR: JOB POSTS
    ============================================================ */
 function renderHRJobs(){
+  draftDates = [];
+  const managers = allUsers.filter(u=>u.role==='manager');
   const open = allJobs.filter(j=>j.status==='approved').length;
   const pending = allJobs.filter(j=>j.status==='pending').length;
   document.getElementById('main').innerHTML = `
-    ${pageHead('Job posts','Create a requisition and send it for manager approval.')}
+    ${pageHead('Job posts','Create a requisition, route it to a manager, and set the dates panel members can offer.')}
     <div class="stat-row">
       <div class="stat"><div class="n">${allJobs.length}</div><div class="l">Total posts</div></div>
       <div class="stat"><div class="n">${open}</div><div class="l">Open</div></div>
@@ -355,34 +396,86 @@ function renderHRJobs(){
     </div>
     <div class="panel-box">
       <div class="panel-box-head"><h3>New job post</h3></div>
+      ${!managers.length ? `<div class="row-empty">No Manager accounts exist yet — have a manager sign up before you can route approvals.</div>` : `
       <div class="form-grid">
         <div><label>Job title</label><input id="jf-title" placeholder="e.g. Backend Engineer"></div>
         <div><label>Department</label><input id="jf-dept" placeholder="e.g. Engineering"></div>
+        <div><label>Tech stack</label><select id="jf-tech">${TECH_STACKS.map(t=>`<option>${t}</option>`).join('')}</select></div>
+        <div><label>Approving manager</label><select id="jf-mgr">${managers.map(m=>`<option value="${m.uid}">${esc(m.name)}</option>`).join('')}</select></div>
         <div class="full"><label>Description</label><textarea id="jf-desc" placeholder="What the role covers, level, key skills..."></textarea></div>
+        <div class="full">
+          <label>Dates panel members can offer slots on</label>
+          <div style="display:flex;gap:8px;">
+            <input type="date" id="jf-newdate">
+            <button class="btn-sm" onclick="addDraftDate()" type="button">Add date</button>
+          </div>
+          <div id="draft-dates" style="margin-top:10px;"></div>
+        </div>
       </div>
-      <div class="form-foot"><button class="btn-sm solid" onclick="createJob()">Submit for approval</button></div>
+      <div class="form-foot"><span></span><button class="btn-sm solid" onclick="createJob()">Submit for approval</button></div>
+      `}
     </div>
     <div class="panel-box">
       <div class="panel-box-head"><h3>All posts</h3></div>
-      <div>${renderJobRows(allJobs)}</div>
+      <div>${renderJobRows(allJobs, true)}</div>
     </div>`;
+  renderDraftDates();
 }
-function renderJobRows(jobs){
+window.addDraftDate = function(){
+  const v = document.getElementById('jf-newdate').value;
+  if(!v) return;
+  if(!draftDates.includes(v)) draftDates.push(v);
+  draftDates.sort();
+  renderDraftDates();
+};
+window.removeDraftDate = function(d){ draftDates = draftDates.filter(x=>x!==d); renderDraftDates(); };
+function renderDraftDates(){
+  const el = document.getElementById('draft-dates');
+  if(!el) return;
+  el.innerHTML = draftDates.length ? draftDates.map(d=>`<span class="slot-chip">${d} <button onclick="removeDraftDate('${d}')">✕</button></span>`).join('')
+    : `<span class="mini-label">No dates added yet.</span>`;
+}
+function renderJobRows(jobs, withTimeline){
   if(!jobs.length) return `<div class="row-empty">No job posts yet.</div>`;
-  return jobs.slice().reverse().map(j=>`
-    <div class="row-item">
-      <div><div class="row-title">${esc(j.title)} <span style="font-weight:400;color:var(--ink-soft);">— ${esc(j.department)}</span></div>
-      <div class="row-sub">${esc(j.description||'')}</div></div>
-      <div class="row-actions">${tagFor(j.status)}</div>
-    </div>`).join('');
+  return jobs.slice().reverse().map(j=>{
+    const mgr = userByUid(j.approverManagerUid);
+    return `<div class="row-item">
+      <div>
+        <div class="row-title">${esc(j.title)} <span style="font-weight:400;color:var(--ink-soft);">— ${esc(j.department)}</span></div>
+        <div class="row-sub">${esc(j.description||'')}</div>
+        <div class="row-sub">Tech: <span class="chip">${esc(j.techStack||'—')}</span> Approver: ${mgr?esc(mgr.name):'—'} ${j.availableDates&&j.availableDates.length?`· Dates: ${j.availableDates.join(', ')}`:''}</div>
+      </div>
+      <div class="row-actions">
+        ${tagFor(j.status)}
+        ${withTimeline?`<button class="btn-sm ghost" onclick="viewTimeline('${j.id}')">Timeline</button>`:''}
+        ${withTimeline && j.status==='approved' ? `<button class="btn-sm danger" onclick="closeJob('${j.id}')">Close job</button>`:''}
+      </div>
+    </div>`;
+  }).join('');
 }
 window.createJob = async function(){
   const title = document.getElementById('jf-title').value.trim();
   const dept = document.getElementById('jf-dept').value.trim();
   const desc = document.getElementById('jf-desc').value.trim();
-  if(!title || !dept) return showToast('Add a title and department.');
-  await addDoc(collection(db,'jobs'), {title, department:dept, description:desc, status:'pending', createdBy:session.uid});
+  const tech = document.getElementById('jf-tech').value;
+  const mgrUid = document.getElementById('jf-mgr').value;
+  if(!title || !dept || !mgrUid) return showToast('Fill in title, department and pick an approver.');
+  if(!draftDates.length) return showToast('Add at least one available date.');
+  const mgr = userByUid(mgrUid);
+  const ref = await addDoc(collection(db,'jobs'), {
+    title, department:dept, description:desc, techStack:tech,
+    availableDates: draftDates.slice(),
+    status:'pending', createdBy:session.uid, createdByName:session.name, createdByEmail:session.email,
+    approverManagerUid: mgrUid, approverManagerName: mgr.name, approverManagerEmail: mgr.email,
+    history: [historyEntry('Job post created')]
+  });
+  await sendNotification(mgr.email, mgr.name, `Job post awaiting your approval: ${title}`,
+    `${session.name} created a job post for ${title} (${dept}) and routed it to you for approval.\n\nReview it in Hire Desk.`);
   showToast('Sent for manager approval.'); window.route('jobs');
+};
+window.closeJob = async function(jobId){
+  await updateDoc(doc(db,'jobs',jobId), { status:'closed', history: arrayUnion(historyEntry('Job closed')) });
+  showToast('Job closed.'); window.route('jobs');
 };
 
 function renderHRAvailability(){
@@ -393,8 +486,10 @@ function renderHRAvailability(){
       const slots = allAvailability.filter(a=>a.jobId===j.id && !a.booked);
       return `<div class="panel-box">
         <div class="panel-box-head"><h3>${esc(j.title)}</h3><span class="mini-label">${slots.length} open slot${slots.length===1?'':'s'}</span></div>
-        <div>${slots.length ? slots.map(s=>`<div class="row-item"><div><div class="row-title">${esc(userName(s.panelUid))}</div>
-          <div class="row-sub">${s.date} · ${s.time}</div></div></div>`).join('') : `<div class="row-empty">No availability submitted for this role yet.</div>`}</div>
+        <div>${slots.length ? slots.map(s=>{
+          const p = userByUid(s.panelUid);
+          return `<div class="row-item"><div><div class="row-title">${p?esc(p.name):'—'}</div><div class="row-sub">${s.date} · ${s.time}</div></div></div>`;
+        }).join('') : `<div class="row-empty">No availability submitted for this role yet.</div>`}</div>
       </div>`;
     }).join('') : `<div class="empty-state"><h3>No open roles yet</h3>Once a manager approves a job post, panel members can add availability for it.</div>`}
   `;
@@ -415,19 +510,16 @@ function renderHRSchedule(){
             ${approvedJobs.map(j=>`<option value="${j.id}">${esc(j.title)} — ${esc(j.department)}</option>`).join('')}
           </select>
         </div>
-        <div class="full"><label>Available slot</label>
-          <select id="sf-slot"><option value="">Select a role first...</option></select>
-        </div>
+        <div class="full"><label>Available slot</label><select id="sf-slot"><option value="">Select a role first...</option></select></div>
       </div>
-      <div class="form-foot"><button class="btn-sm solid" onclick="scheduleInterview()">Schedule interview</button></div>
+      <div class="form-foot"><span></span><button class="btn-sm solid" onclick="scheduleInterview()">Schedule interview</button></div>
     </div>`;
 }
 window.refreshSlotOptions = function(){
   const jobId = document.getElementById('sf-job').value;
   const sel = document.getElementById('sf-slot');
   const slots = allAvailability.filter(a=>a.jobId===jobId && !a.booked);
-  sel.innerHTML = slots.length
-    ? slots.map(s=>`<option value="${s.id}">${esc(userName(s.panelUid))} — ${s.date} · ${s.time}</option>`).join('')
+  sel.innerHTML = slots.length ? slots.map(s=>`<option value="${s.id}">${esc(userByUid(s.panelUid)?.name||'—')} — ${s.date} · ${s.time}</option>`).join('')
     : `<option value="">No slots available for this role</option>`;
 };
 window.scheduleInterview = async function(){
@@ -438,11 +530,23 @@ window.scheduleInterview = async function(){
   if(!cand || !jobId || !slotId) return showToast('Fill in candidate, role and a slot.');
   const slot = allAvailability.find(a=>a.id===slotId);
   if(!slot || slot.booked) return showToast('That slot is no longer available.');
+  const job = allJobs.find(j=>j.id===jobId);
+  const panel = userByUid(slot.panelUid);
   await updateDoc(doc(db,'availability',slotId), {booked:true});
   await addDoc(collection(db,'interviews'), {
     jobId, candidateName:cand, candidateEmail:candEmail, panelUid:slot.panelUid,
     date:slot.date, time:slot.time, status:'scheduled', feedback:null
   });
+  await updateDoc(doc(db,'jobs',jobId), { history: arrayUnion(historyEntry(`Interview scheduled with ${cand} — panel: ${panel?panel.name:''} on ${slot.date} ${slot.time}`)) });
+  if(panel){
+    await sendNotification(panel.email, panel.name, `Interview scheduled: ${job.title}`,
+      `You're on the panel for ${cand} (${job.title}) on ${slot.date} at ${slot.time}.`);
+    const panelMgr = panel.managerUid ? userByUid(panel.managerUid) : null;
+    if(panelMgr){
+      await sendNotification(panelMgr.email, panelMgr.name, `Interview scheduled: ${panel.name} on ${job.title} panel`,
+        `${panel.name} is on the interview panel for ${cand} (${job.title}) on ${slot.date} at ${slot.time}.`);
+    }
+  }
   showToast('Interview scheduled.'); window.route('schedule');
 };
 
@@ -452,40 +556,68 @@ function renderHRInterviews(){
     <div class="panel-box"><div>${
       allInterviews.length ? allInterviews.slice().reverse().map(i=>{
         const job = allJobs.find(j=>j.id===i.jobId);
-        return `<div class="row-item">
-          <div style="flex:1;">
-            <div class="row-title">${esc(i.candidateName)} <span style="font-weight:400;color:var(--ink-soft);">— ${job?esc(job.title):'—'}</span></div>
-            <div class="row-sub">Panel: ${esc(userName(i.panelUid))} · ${i.date} · ${i.time}</div>
-            ${i.feedback ? `<div class="row-sub" style="margin-top:8px;padding:10px;background:var(--paper-dim);">
-              <strong>Feedback:</strong> ${i.feedback.recommend==='yes'?'Recommends hire':'Does not recommend'} — "${esc(i.feedback.comments)}"</div>` : ''}
-          </div>${tagFor(i.status)}
-        </div>`;
+        const p = userByUid(i.panelUid);
+        return `<div class="row-item"><div style="flex:1;">
+          <div class="row-title">${esc(i.candidateName)} <span style="font-weight:400;color:var(--ink-soft);">— ${job?esc(job.title):'—'}</span></div>
+          <div class="row-sub">Panel: ${p?esc(p.name):'—'} · ${i.date} · ${i.time}</div>
+          ${i.feedback ? `<div class="row-sub" style="margin-top:8px;padding:10px;background:var(--paper-dim);"><strong>Feedback:</strong> ${i.feedback.recommend==='yes'?'Recommends hire':'Does not recommend'} — "${esc(i.feedback.comments)}"</div>`:''}
+        </div>${tagFor(i.status)}</div>`;
       }).join('') : `<div class="row-empty">No interviews scheduled yet.</div>`
     }</div></div>`;
 }
+
+function renderHRTeam(){
+  const people = allUsers.filter(u=>u.role==='hr'||u.role==='panel');
+  const managers = allUsers.filter(u=>u.role==='manager');
+  document.getElementById('main').innerHTML = `
+    ${pageHead('Team & managers','Assign each person\u2019s manager. Panel tech stacks are set by them at sign-up.')}
+    <div class="panel-box"><div>${
+      people.length ? people.map(p=>`
+        <div class="row-item">
+          <div>
+            <div class="row-title">${esc(p.name)} <span class="badge ${p.role==='hr'?'hr':'panel'}" style="margin-left:6px;">${p.role==='hr'?'HR':'Panel'}</span></div>
+            <div class="row-sub">${esc(p.email)}</div>
+            ${p.role==='panel' ? `<div style="margin-top:6px;">${(p.techStacks||[]).map(t=>`<span class="chip">${esc(t)}</span>`).join('') || '<span class="mini-label">No tech stack set</span>'}</div>` : ''}
+          </div>
+          <div>
+            <label class="mini-label">Manager</label><br>
+            <select onchange="assignManager('${p.uid}', this.value)">
+              <option value="">— None —</option>
+              ${managers.map(m=>`<option value="${m.uid}" ${p.managerUid===m.uid?'selected':''}>${esc(m.name)}</option>`).join('')}
+            </select>
+          </div>
+        </div>`).join('') : `<div class="row-empty">No HR or Panel accounts yet.</div>`
+    }</div></div>`;
+}
+window.assignManager = async function(uid, managerUid){
+  await updateDoc(doc(db,'users',uid), { managerUid: managerUid || null });
+  showToast('Manager updated.'); window.route('team');
+};
 
 /* ============================================================
    PANEL VIEWS
    ============================================================ */
 function renderPanelOpenJobs(){
-  const jobs = allJobs.filter(j=>j.status==='approved');
+  const jobs = allJobs.filter(j=>j.status==='approved' && (session.techStacks||[]).includes(j.techStack));
   document.getElementById('main').innerHTML = `
-    ${pageHead('Open roles','Add the times you can interview for a role.')}
+    ${pageHead('Open roles','Roles matching your tech stack. Add the times you can interview.')}
     ${jobs.length ? jobs.map(j=>{
       const mySlots = allAvailability.filter(a=>a.jobId===j.id && a.panelUid===session.uid);
       return `<div class="panel-box">
-        <div class="panel-box-head"><h3>${esc(j.title)}</h3><span class="mini-label">${esc(j.department)}</span></div>
+        <div class="panel-box-head"><h3>${esc(j.title)}</h3><span class="mini-label">${esc(j.department)} · ${esc(j.techStack)}</span></div>
         <div style="padding:16px 18px;">
           <div class="row-sub" style="margin-bottom:12px;">${esc(j.description||'')}</div>
           <div style="margin-bottom:12px;">${mySlots.map(s=>`<span class="slot-chip">${s.date} · ${s.time} ${s.booked?'(booked)':''} ${!s.booked?`<button onclick="removeSlot('${s.id}')">✕</button>`:''}</span>`).join('') || '<span class="mini-label">No slots added yet.</span>'}</div>
-          <div style="display:flex;gap:8px;align-items:flex-end;">
-            <div><label class="mini-label">Date</label><br><input type="date" id="av-date-${j.id}" style="padding:8px;border:1px solid var(--hairline-strong);"></div>
+          <div style="display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;">
+            <div><label class="mini-label">Date</label><br>
+              <select id="av-date-${j.id}">${(j.availableDates||[]).map(d=>`<option value="${d}">${d}</option>`).join('') || '<option value="">No dates set</option>'}</select>
+            </div>
             <div><label class="mini-label">Time</label><br><input type="time" id="av-time-${j.id}" style="padding:8px;border:1px solid var(--hairline-strong);"></div>
             <button class="btn-sm" onclick="addSlot('${j.id}')">Add slot</button>
           </div>
         </div>
       </div>`;
-    }).join('') : `<div class="empty-state"><h3>No open roles right now</h3>Check back once HR has posted and a manager has approved a role.</div>`}
+    }).join('') : `<div class="empty-state"><h3>No open roles for your tech stack right now</h3>Check back once HR posts a role matching your skills.</div>`}
   `;
 }
 window.addSlot = async function(jobId){
@@ -493,31 +625,34 @@ window.addSlot = async function(jobId){
   const time = document.getElementById(`av-time-${jobId}`).value;
   if(!date || !time) return showToast('Pick a date and time.');
   await addDoc(collection(db,'availability'), {jobId, panelUid:session.uid, date, time, booked:false});
+  const job = allJobs.find(j=>j.id===jobId);
+  await updateDoc(doc(db,'jobs',jobId), { history: arrayUnion(historyEntry(`${session.name} added availability: ${date} ${time}`)) });
+  if(job && job.createdByEmail){
+    await sendNotification(job.createdByEmail, job.createdByName, `New availability: ${job.title}`,
+      `${session.name} added a slot for ${job.title}: ${date} at ${time}. Go to Hire Desk to schedule.`);
+  }
   showToast('Availability added.'); window.route('openjobs');
 };
 window.removeSlot = async function(slotId){
   await updateDoc(doc(db,'availability',slotId), {removed:true});
-  // Simplest safe approach without a delete import: mark removed and filter it out client-side.
   allAvailability = allAvailability.filter(s=>s.id!==slotId);
   showToast('Slot removed.');
-  if(document.querySelector('.page-head h1').textContent.includes('My availability')) renderPanelMyAvail();
-  else renderPanelOpenJobs();
+  const h1 = document.querySelector('.page-head h1');
+  if(h1 && h1.textContent.includes('My availability')) renderPanelMyAvail(); else renderPanelOpenJobs();
 };
 
 function renderPanelMyAvail(){
-  const mine = allAvailability.filter(a=>a.panelUid===session.uid && !a.removed);
+  const mine = allAvailability.filter(a=>a.panelUid===session.uid);
   document.getElementById('main').innerHTML = `
     ${pageHead('My availability','Every slot you\u2019ve offered, across all roles.')}
     <div class="panel-box"><div>${
       mine.length ? mine.map(s=>{
         const job = allJobs.find(j=>j.id===s.jobId);
-        return `<div class="row-item"><div><div class="row-title">${job?esc(job.title):'—'}</div>
-          <div class="row-sub">${s.date} · ${s.time}</div></div>
-          ${s.booked ? `<span class="tag scheduled">Booked</span>` : `<button class="btn-sm ghost" onclick="removeSlot('${s.id}')">Remove</button>`}</div>`;
+        return `<div class="row-item"><div><div class="row-title">${job?esc(job.title):'—'}</div><div class="row-sub">${s.date} · ${s.time}</div></div>
+          ${s.booked?`<span class="tag scheduled">Booked</span>`:`<button class="btn-sm ghost" onclick="removeSlot('${s.id}')">Remove</button>`}</div>`;
       }).join('') : `<div class="row-empty">You haven't added any availability yet.</div>`
     }</div></div>`;
 }
-
 function renderPanelInterviews(){
   const mine = allInterviews.filter(i=>i.panelUid===session.uid);
   document.getElementById('main').innerHTML = `
@@ -525,12 +660,10 @@ function renderPanelInterviews(){
     <div class="panel-box"><div>${
       mine.length ? mine.slice().reverse().map(i=>{
         const job = allJobs.find(j=>j.id===i.jobId);
-        return `<div class="row-item"><div><div class="row-title">${esc(i.candidateName)} — ${job?esc(job.title):'—'}</div>
-          <div class="row-sub">${i.date} · ${i.time}</div></div>${tagFor(i.status)}</div>`;
+        return `<div class="row-item"><div><div class="row-title">${esc(i.candidateName)} — ${job?esc(job.title):'—'}</div><div class="row-sub">${i.date} · ${i.time}</div></div>${tagFor(i.status)}</div>`;
       }).join('') : `<div class="row-empty">No interviews scheduled yet.</div>`
     }</div></div>`;
 }
-
 function renderPanelFeedback(){
   const pending = allInterviews.filter(i=>i.panelUid===session.uid && i.status==='scheduled');
   document.getElementById('main').innerHTML = `
@@ -541,9 +674,7 @@ function renderPanelFeedback(){
         return `<div class="row-item" style="display:block;">
           <div class="row-title" style="margin-bottom:10px;">${esc(i.candidateName)} — ${job?esc(job.title):'—'}</div>
           <div class="form-grid" style="padding:0;">
-            <div class="full"><label>Recommendation</label>
-              <select id="fb-rec-${i.id}"><option value="yes">Recommend hire</option><option value="no">Do not recommend</option></select>
-            </div>
+            <div class="full"><label>Recommendation</label><select id="fb-rec-${i.id}"><option value="yes">Recommend hire</option><option value="no">Do not recommend</option></select></div>
             <div class="full"><label>Comments</label><textarea id="fb-com-${i.id}" placeholder="Notes on the interview..."></textarea></div>
           </div>
           <div style="margin-top:10px;"><button class="btn-sm solid" onclick="submitFeedback('${i.id}')">Submit feedback</button></div>
@@ -554,9 +685,9 @@ function renderPanelFeedback(){
 window.submitFeedback = async function(interviewId){
   const recommend = document.getElementById(`fb-rec-${interviewId}`).value;
   const comments = document.getElementById(`fb-com-${interviewId}`).value.trim();
-  await updateDoc(doc(db,'interviews',interviewId), {
-    feedback: { recommend, comments, by: session.uid }, status: 'completed'
-  });
+  const i = allInterviews.find(x=>x.id===interviewId);
+  await updateDoc(doc(db,'interviews',interviewId), { feedback:{recommend,comments,by:session.uid}, status:'completed' });
+  if(i){ await updateDoc(doc(db,'jobs',i.jobId), { history: arrayUnion(historyEntry(`${session.name} submitted feedback for ${i.candidateName}`)) }); }
   showToast('Feedback submitted.'); window.route('feedback');
 };
 
@@ -564,13 +695,14 @@ window.submitFeedback = async function(interviewId){
    MANAGER VIEWS
    ============================================================ */
 function renderMgrApprovals(){
-  const pending = allJobs.filter(j=>j.status==='pending');
+  const pending = allJobs.filter(j=>j.status==='pending' && j.approverManagerUid===session.uid);
   document.getElementById('main').innerHTML = `
-    ${pageHead('Job approvals','Review new requisitions before they go live to panels.')}
+    ${pageHead('Job approvals','Requisitions routed to you specifically.')}
     <div class="panel-box"><div>${
       pending.length ? pending.map(j=>`
         <div class="row-item">
-          <div><div class="row-title">${esc(j.title)} — ${esc(j.department)}</div><div class="row-sub">${esc(j.description||'')}</div></div>
+          <div><div class="row-title">${esc(j.title)} — ${esc(j.department)}</div><div class="row-sub">${esc(j.description||'')}</div>
+          <div class="row-sub">From ${esc(j.createdByName)} · Tech: ${esc(j.techStack)}</div></div>
           <div class="row-actions">
             <button class="btn-sm solid" onclick="decideJob('${j.id}','approved')">Approve</button>
             <button class="btn-sm danger" onclick="decideJob('${j.id}','rejected')">Reject</button>
@@ -579,7 +711,15 @@ function renderMgrApprovals(){
     }</div></div>`;
 }
 window.decideJob = async function(jobId, decision){
-  await updateDoc(doc(db,'jobs',jobId), {status: decision});
+  const job = allJobs.find(j=>j.id===jobId);
+  await updateDoc(doc(db,'jobs',jobId), { status:decision, history: arrayUnion(historyEntry(`Manager ${decision} the job post`)) });
+  if(decision==='approved'){
+    const matchingPanel = allUsers.filter(u=>u.role==='panel' && (u.techStacks||[]).includes(job.techStack));
+    for(const p of matchingPanel){
+      await sendNotification(p.email, p.name, `New role open: ${job.title}`,
+        `A ${job.techStack} role (${job.title}) is open. Please add your available interview slots on: ${(job.availableDates||[]).join(', ')}.`);
+    }
+  }
   showToast(decision==='approved'?'Job post approved.':'Job post rejected.'); window.route('approvals');
 };
 
@@ -589,14 +729,11 @@ function renderMgrOffers(){
     ${pageHead('Offer approvals','Interviews with feedback, awaiting your final call.')}
     <div class="panel-box"><div>${
       ready.length ? ready.map(i=>{
-        const job = allJobs.find(j=>j.id===i.jobId);
+        const job = allJobs.find(j=>j.id===i.jobId); const p = userByUid(i.panelUid);
         return `<div class="row-item">
-          <div>
-            <div class="row-title">${esc(i.candidateName)} — ${job?esc(job.title):'—'}</div>
-            <div class="row-sub">Panel: ${esc(userName(i.panelUid))}</div>
-            <div class="row-sub" style="margin-top:8px;padding:10px;background:var(--paper-dim);">
-              ${i.feedback.recommend==='yes'?'Recommends hire':'Does not recommend'} — "${esc(i.feedback.comments)}"</div>
-          </div>
+          <div><div class="row-title">${esc(i.candidateName)} — ${job?esc(job.title):'—'}</div>
+          <div class="row-sub">Panel: ${p?esc(p.name):'—'}</div>
+          <div class="row-sub" style="margin-top:8px;padding:10px;background:var(--paper-dim);">${i.feedback.recommend==='yes'?'Recommends hire':'Does not recommend'} — "${esc(i.feedback.comments)}"</div></div>
           <div class="row-actions">
             <button class="btn-sm solid" onclick="decideOffer('${i.id}','offer_approved')">Approve offer</button>
             <button class="btn-sm danger" onclick="decideOffer('${i.id}','offer_rejected')">Decline</button>
@@ -606,7 +743,9 @@ function renderMgrOffers(){
     }</div></div>`;
 }
 window.decideOffer = async function(interviewId, decision){
-  await updateDoc(doc(db,'interviews',interviewId), {status: decision});
+  const i = allInterviews.find(x=>x.id===interviewId);
+  await updateDoc(doc(db,'interviews',interviewId), {status:decision});
+  if(i){ await updateDoc(doc(db,'jobs',i.jobId), { history: arrayUnion(historyEntry(`Manager recorded offer decision: ${decision} for ${i.candidateName}`)) }); }
   showToast('Decision recorded.'); window.route('offers');
 };
 
@@ -621,12 +760,11 @@ function renderMgrReports(){
       <div class="stat"><div class="n">${interviewsCount}</div><div class="l">Interviews</div></div>
       <div class="stat"><div class="n">${hired}</div><div class="l">Offers approved</div></div>
     </div>
-    <div class="panel-box"><div class="panel-box-head"><h3>All job posts</h3></div><div>${renderJobRows(allJobs)}</div></div>
+    <div class="panel-box"><div class="panel-box-head"><h3>All job posts</h3></div><div>${renderJobRows(allJobs, true)}</div></div>
     <div class="panel-box"><div class="panel-box-head"><h3>All interviews</h3></div><div>${
       allInterviews.length ? allInterviews.slice().reverse().map(i=>{
         const job = allJobs.find(j=>j.id===i.jobId);
-        return `<div class="row-item"><div><div class="row-title">${esc(i.candidateName)} — ${job?esc(job.title):'—'}</div>
-          <div class="row-sub">${i.date} · ${i.time}</div></div>${tagFor(i.status)}</div>`;
+        return `<div class="row-item"><div><div class="row-title">${esc(i.candidateName)} — ${job?esc(job.title):'—'}</div><div class="row-sub">${i.date} · ${i.time}</div></div>${tagFor(i.status)}</div>`;
       }).join('') : `<div class="row-empty">No interviews yet.</div>`
     }</div></div>`;
 }
