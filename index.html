@@ -17,17 +17,17 @@
   *{box-sizing:border-box;}
   body{margin:0;background:var(--paper);color:var(--ink);font-family:'IBM Plex Sans',sans-serif;font-size:15px;line-height:1.5;}
   h1,h2,h3{font-family:'Fraunces',serif;font-weight:600;margin:0;letter-spacing:-0.01em;}
-  button{font-family:inherit;cursor:pointer;}
-  input,select,textarea{font-family:inherit;font-size:14px;}
-  #auth-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;}
-  .auth-card{width:100%;max-width:440px;background:#fff;border:1px solid var(--hairline);padding:36px 32px;}
+  button{font-family:inherit;cursor:pointer;transition:background .15s ease,color .15s ease,border-color .15s ease;}
+  input,select,textarea{font-family:inherit;font-size:14px;transition:border-color .15s ease;}
+  #auth-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:linear-gradient(180deg,var(--paper) 0%,var(--paper-dim) 100%);}
+  .auth-card{width:100%;max-width:440px;background:#fff;border:1px solid var(--hairline);padding:36px 32px;box-shadow:0 2px 24px rgba(32,36,31,0.06);}
   .auth-brand{display:flex;align-items:baseline;gap:8px;margin-bottom:4px;}
   .auth-brand .mark{width:10px;height:10px;background:var(--ink);display:inline-block;}
   .auth-tag{color:var(--ink-soft);font-size:13px;margin-bottom:28px;}
   .field{margin-bottom:16px;}
   .field label{display:block;font-size:12.5px;color:var(--ink-soft);margin-bottom:6px;}
   .field input,.field select{width:100%;padding:10px 11px;border:1px solid var(--hairline-strong);background:var(--paper);}
-  .field input:focus{outline:2px solid var(--ink);outline-offset:1px;}
+  .field input:focus,.field select:focus{outline:none;border-color:var(--ink);}
   .role-pick{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
   .role-opt{border:1px solid var(--hairline-strong);padding:10px 6px;text-align:center;font-size:13px;background:var(--paper);}
   .role-opt.active{border-color:var(--ink);background:var(--ink);color:#fff;}
@@ -35,6 +35,7 @@
   .chk-opt{display:flex;align-items:center;gap:6px;font-size:13px;border:1px solid var(--hairline-strong);padding:7px 8px;}
   .chk-opt input{margin:0;}
   .btn-primary{width:100%;background:var(--ink);color:#fff;border:none;padding:12px;font-size:14px;font-weight:600;margin-top:6px;}
+  .btn-primary:hover{background:#000;}
   .btn-primary[disabled]{opacity:0.5;cursor:not-allowed;}
   .auth-switch{margin-top:18px;font-size:13px;color:var(--ink-soft);text-align:center;}
   .auth-switch a{color:var(--ink);cursor:pointer;text-decoration:underline;}
@@ -42,12 +43,14 @@
   .auth-note{font-size:11.5px;color:var(--ink-soft);margin-top:18px;border-top:1px solid var(--hairline);padding-top:14px;}
   #app-screen{display:none;min-height:100vh;}
   .shell{display:flex;min-height:100vh;}
-  .rail{width:220px;flex-shrink:0;border-right:1px solid var(--hairline);padding:24px 0;display:flex;flex-direction:column;}
+  .rail{width:224px;flex-shrink:0;border-right:1px solid var(--hairline);padding:24px 0;display:flex;flex-direction:column;background:#fff;}
   .rail-brand{padding:0 22px 20px;border-bottom:1px solid var(--hairline);margin-bottom:8px;}
   .rail-brand .mark{width:9px;height:9px;background:var(--ink);display:inline-block;margin-right:7px;}
   .rail-nav{padding:8px 12px;flex:1;}
-  .rail-nav button{display:block;width:100%;text-align:left;background:none;border:none;padding:10px 10px;font-size:14px;color:var(--ink-soft);margin-bottom:2px;}
+  .rail-nav button{display:flex;align-items:center;gap:9px;width:100%;text-align:left;background:none;border:none;padding:10px 11px;font-size:14px;color:var(--ink-soft);margin-bottom:2px;border-radius:2px;}
+  .rail-nav button .ic{width:15px;text-align:center;flex-shrink:0;opacity:0.75;}
   .rail-nav button.active{background:var(--paper-dim);color:var(--ink);font-weight:600;}
+  .rail-nav button.active .ic{opacity:1;}
   .rail-nav button:hover:not(.active){background:var(--paper-dim);}
   .rail-foot{padding:14px 22px;border-top:1px solid var(--hairline);}
   .who{font-size:13px;font-weight:600;}
@@ -56,25 +59,27 @@
   .badge.panel{background:var(--panel-tint);color:var(--panel);}
   .badge.mgr{background:var(--mgr-tint);color:var(--mgr);}
   .logout{margin-top:10px;background:none;border:none;font-size:12.5px;color:var(--ink-soft);text-decoration:underline;padding:0;}
+  .mobile-topbar{display:none;}
   .main{flex:1;padding:36px 44px;max-width:1020px;}
-  .page-head{margin-bottom:26px;}
+  .page-head{margin-bottom:26px;display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;}
   .page-head h1{font-size:26px;}
   .page-head p{color:var(--ink-soft);font-size:13.5px;margin-top:6px;}
-  .stat-row{display:flex;border:1px solid var(--hairline);margin-bottom:28px;flex-wrap:wrap;}
+  .stat-row{display:flex;border:1px solid var(--hairline);margin-bottom:28px;flex-wrap:wrap;background:#fff;}
   .stat{flex:1;min-width:120px;padding:16px 20px;border-right:1px solid var(--hairline);border-bottom:1px solid var(--hairline);}
   .stat:last-child{border-right:none;}
   .stat .n{font-family:'Fraunces',serif;font-size:28px;font-weight:600;}
   .stat .l{font-size:12px;color:var(--ink-soft);margin-top:2px;}
-  .panel-box{border:1px solid var(--hairline);background:#fff;margin-bottom:24px;}
+  .panel-box{border:1px solid var(--hairline);background:#fff;margin-bottom:24px;box-shadow:0 1px 2px rgba(32,36,31,0.03);}
   .panel-box-head{padding:14px 18px;border-bottom:1px solid var(--hairline);display:flex;justify-content:space-between;align-items:center;}
   .panel-box-head h3{font-size:15px;}
-  .row-item{padding:14px 18px;border-bottom:1px solid var(--hairline);display:flex;justify-content:space-between;align-items:flex-start;gap:16px;}
+  .row-item{padding:14px 18px;border-bottom:1px solid var(--hairline);display:flex;justify-content:space-between;align-items:flex-start;gap:16px;transition:background .15s ease;}
+  .row-item:hover{background:var(--paper-dim);}
   .row-item:last-child{border-bottom:none;}
   .row-empty{padding:24px 18px;color:var(--ink-soft);font-size:13.5px;font-style:italic;}
   .row-title{font-weight:600;font-size:14px;}
   .row-sub{font-size:12.5px;color:var(--ink-soft);margin-top:3px;line-height:1.5;}
   .row-actions{display:flex;gap:8px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end;}
-  .tag{font-size:10.5px;padding:3px 8px;font-weight:600;white-space:nowrap;}
+  .tag{font-size:10.5px;padding:3px 8px;font-weight:600;white-space:nowrap;border-radius:2px;}
   .tag.pending{background:var(--mgr-tint);color:var(--mgr);}
   .tag.approved{background:var(--panel-tint);color:var(--panel);}
   .tag.rejected{background:var(--danger-tint);color:var(--danger);}
@@ -83,10 +88,11 @@
   .tag.completed{background:#EDEDED;color:#555;}
   .tag.offer_approved{background:var(--panel-tint);color:var(--panel);}
   .tag.offer_rejected{background:var(--danger-tint);color:var(--danger);}
-  .chip{display:inline-block;font-size:10.5px;padding:2px 8px;border:1px solid var(--hairline-strong);margin:0 4px 4px 0;color:var(--ink-soft);}
-  .btn-sm{border:1px solid var(--ink);background:#fff;padding:6px 12px;font-size:12.5px;font-weight:600;}
+  .chip{display:inline-block;font-size:10.5px;padding:2px 8px;border:1px solid var(--hairline-strong);margin:0 4px 4px 0;color:var(--ink-soft);border-radius:2px;}
+  .btn-sm{border:1px solid var(--ink);background:#fff;padding:6px 12px;font-size:12.5px;font-weight:600;border-radius:2px;}
   .btn-sm:hover{background:var(--ink);color:#fff;}
   .btn-sm.solid{background:var(--ink);color:#fff;}
+  .btn-sm.solid:hover{background:#000;}
   .btn-sm.ghost{border-color:var(--hairline-strong);color:var(--ink-soft);}
   .btn-sm.danger{border-color:var(--danger);color:var(--danger);}
   .btn-sm.danger:hover{background:var(--danger);color:#fff;}
@@ -94,17 +100,18 @@
   .form-grid .full{grid-column:1/-1;}
   .form-grid label{display:block;font-size:12px;color:var(--ink-soft);margin-bottom:5px;}
   .form-grid input,.form-grid select,.form-grid textarea{width:100%;padding:9px 10px;border:1px solid var(--hairline-strong);background:var(--paper);}
+  .form-grid input:focus,.form-grid select:focus,.form-grid textarea:focus{outline:none;border-color:var(--ink);}
   .form-grid textarea{min-height:70px;resize:vertical;}
   .form-foot{padding:14px 18px;border-top:1px solid var(--hairline);display:flex;justify-content:space-between;align-items:center;gap:10px;}
-  .slot-chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--hairline-strong);padding:5px 10px;font-size:12.5px;margin:0 6px 6px 0;}
+  .slot-chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--hairline-strong);padding:5px 10px;font-size:12.5px;margin:0 6px 6px 0;border-radius:2px;}
   .slot-chip button{background:none;border:none;color:var(--danger);font-size:14px;line-height:1;padding:0;}
   .mini-label{font-size:11px;color:var(--ink-soft);}
-  .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:11px 20px;font-size:13.5px;z-index:60;display:none;max-width:80vw;}
+  .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:11px 20px;font-size:13.5px;z-index:60;display:none;max-width:80vw;box-shadow:0 4px 20px rgba(0,0,0,0.2);}
   .empty-state{padding:50px 20px;text-align:center;color:var(--ink-soft);}
   .empty-state h3{color:var(--ink);margin-bottom:6px;font-size:17px;}
   .loading-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;color:var(--ink-soft);font-size:14px;}
   .modal-bg{display:none;position:fixed;inset:0;background:rgba(32,36,31,0.45);align-items:center;justify-content:center;z-index:80;padding:20px;}
-  .modal{background:#fff;width:100%;max-width:480px;max-height:80vh;overflow-y:auto;border:1px solid var(--hairline);}
+  .modal{background:#fff;width:100%;max-width:480px;max-height:80vh;overflow-y:auto;border:1px solid var(--hairline);box-shadow:0 8px 40px rgba(0,0,0,0.2);}
   .modal-head{padding:16px 20px;border-bottom:1px solid var(--hairline);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:#fff;}
   .modal-head h3{font-size:16px;}
   .modal-close{background:none;border:none;font-size:20px;color:var(--ink-soft);line-height:1;}
@@ -115,9 +122,13 @@
   select[multiple]{height:auto;}
   @media (max-width:760px){
     .shell{flex-direction:column;}
-    .rail{width:100%;flex-direction:row;align-items:center;padding:12px 16px;overflow-x:auto;}
-    .rail-brand,.rail-foot{display:none;}
-    .rail-nav{display:flex;padding:0;gap:4px;}
+    .rail{display:none;}
+    .mobile-topbar{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-bottom:1px solid var(--hairline);background:#fff;position:sticky;top:0;z-index:40;}
+    .mobile-topbar .mt-who{font-size:13px;}
+    .mobile-topbar .mt-who strong{display:block;font-size:14px;}
+    .mobile-nav{display:flex;overflow-x:auto;gap:4px;padding:10px 12px;background:#fff;border-bottom:1px solid var(--hairline);position:sticky;top:57px;z-index:39;}
+    .mobile-nav button{flex-shrink:0;background:var(--paper-dim);border:none;padding:8px 13px;font-size:13px;color:var(--ink-soft);white-space:nowrap;}
+    .mobile-nav button.active{background:var(--ink);color:#fff;font-weight:600;}
     .main{padding:22px 18px;}
     .form-grid{grid-template-columns:1fr;}
   }
@@ -152,6 +163,7 @@
           <div class="role-opt" data-role="manager" onclick="pickRole('manager')">Manager</div>
         </div>
       </div>
+      <div class="field"><label>Department</label><select id="su-dept"></select></div>
       <div class="field" id="techstack-field" style="display:none;">
         <label>Your tech stack(s)</label>
         <div class="chk-grid" id="techstack-checks"></div>
@@ -164,6 +176,11 @@
 </div>
 
 <div id="app-screen">
+  <div class="mobile-topbar">
+    <div class="mt-who"><strong id="mt-name"></strong><span class="badge" id="mt-badge"></span></div>
+    <button class="logout" onclick="doSignOut()">Sign out</button>
+  </div>
+  <div class="mobile-nav" id="mobile-nav"></div>
   <div class="shell">
     <div class="rail">
       <div class="rail-brand"><span class="mark"></span><strong>Hire Desk</strong></div>
@@ -206,6 +223,8 @@ const firebaseConfig = {
 const fbApp = initializeApp(firebaseConfig);
 const auth = getAuth(fbApp);
 const db = getFirestore(fbApp);
+const secondaryApp = initializeApp(firebaseConfig, 'Secondary'); // used only for creating other users' accounts
+const secondaryAuth = getAuth(secondaryApp);
 
 const ALLOWED_DOMAIN = null; // set to e.g. "acmecorp.com" to restrict sign-up later
 
@@ -226,21 +245,29 @@ async function sendNotification(toEmail, toName, subject, message){
 }
 
 let TECH_STACKS = ['Salesforce','SAP','Java','DevOps','QA Functional','QA Automation','React JS'];
+let DEPARTMENTS = ['Engineering','Sales','Marketing','Human Resources','Finance','Operations'];
 
-async function loadTechStacksPublic(){
+async function loadConfigPublic(){
   try{
     const snap = await getDoc(doc(db,'config','techstacks'));
-    if(snap.exists() && Array.isArray(snap.data().list) && snap.data().list.length){
-      TECH_STACKS = snap.data().list;
-    }
-  }catch(e){ /* fall back to defaults above if the doc doesn't exist yet or read fails */ }
+    if(snap.exists() && Array.isArray(snap.data().list) && snap.data().list.length) TECH_STACKS = snap.data().list;
+  }catch(e){}
+  try{
+    const snap2 = await getDoc(doc(db,'config','departments'));
+    if(snap2.exists() && Array.isArray(snap2.data().list) && snap2.data().list.length) DEPARTMENTS = snap2.data().list;
+  }catch(e){}
   renderTechstackChecks();
+  renderDeptSelect();
 }
 function renderTechstackChecks(){
   document.getElementById('techstack-checks').innerHTML = TECH_STACKS.map(t=>`
     <label class="chk-opt"><input type="checkbox" value="${t}" class="ts-check"> ${t}</label>`).join('');
 }
-loadTechStacksPublic();
+function renderDeptSelect(){
+  const el = document.getElementById('su-dept');
+  if(el) el.innerHTML = DEPARTMENTS.map(d=>`<option>${d}</option>`).join('');
+}
+loadConfigPublic();
 
 let session = null;
 let signupRole = 'hr';
@@ -301,10 +328,11 @@ window.doSignUp = async function(){
   if(ALLOWED_DOMAIN && !email.endsWith('@'+ALLOWED_DOMAIN)) return authFail(`Use your @${ALLOWED_DOMAIN} email.`);
   const techStacks = signupRole==='panel' ? Array.from(document.querySelectorAll('.ts-check:checked')).map(c=>c.value) : [];
   if(signupRole==='panel' && !techStacks.length) return authFail('Select at least one tech stack.');
+  const department = document.getElementById('su-dept').value;
   const btn = document.getElementById('su-btn'); btn.disabled=true; btn.textContent='Creating...';
   try{
     const cred = await createUserWithEmailAndPassword(auth, email, pass);
-    await setDoc(doc(db,'users',cred.user.uid), { name, email, role:signupRole, managerUid:null, techStacks });
+    await setDoc(doc(db,'users',cred.user.uid), { name, email, role:signupRole, managerUid:null, techStacks, department });
   }catch(err){ authFail(friendlyAuthError(err)); }
   btn.disabled=false; btn.textContent='Create account';
 };
@@ -325,7 +353,7 @@ onAuthStateChanged(auth, async (user) => {
     const snap = await getDoc(doc(db,'users',user.uid));
     if(snap.exists()){
       const u = snap.data();
-      session = { uid:user.uid, email:u.email, name:u.name, role:u.role, managerUid:u.managerUid||null, techStacks:u.techStacks||[] };
+      session = { uid:user.uid, email:u.email, name:u.name, role:u.role, managerUid:u.managerUid||null, techStacks:u.techStacks||[], department:u.department||'' };
       document.getElementById('auth-screen').style.display='none';
       document.getElementById('app-screen').style.display='block';
       await enterApp();
@@ -349,42 +377,58 @@ async function loadAll(){
     const tsSnap = await getDoc(doc(db,'config','techstacks'));
     if(tsSnap.exists() && Array.isArray(tsSnap.data().list) && tsSnap.data().list.length) TECH_STACKS = tsSnap.data().list;
   }catch(e){ /* keep current TECH_STACKS on failure */ }
+  try{
+    const dSnap = await getDoc(doc(db,'config','departments'));
+    if(dSnap.exists() && Array.isArray(dSnap.data().list) && dSnap.data().list.length) DEPARTMENTS = dSnap.data().list;
+  }catch(e){ /* keep current DEPARTMENTS on failure */ }
   allUsers = usersSnap.docs.map(d=>({uid:d.id, ...d.data()}));
   allJobs = jobsSnap.docs.map(d=>({id:d.id, ...d.data()}));
   allAvailability = availSnap.docs.map(d=>({id:d.id, ...d.data()})).filter(a=>!a.removed);
   allInterviews = intSnap.docs.map(d=>({id:d.id, ...d.data()}));
   // keep session's own live copy in sync (e.g. manager assignment changes)
   const me = allUsers.find(u=>u.uid===session.uid);
-  if(me){ session.managerUid = me.managerUid||null; session.techStacks = me.techStacks||[]; }
+  if(me){ session.managerUid = me.managerUid||null; session.techStacks = me.techStacks||[]; session.department = me.department||''; session.name = me.name; }
 }
 
 /* ============================================================
    SHELL / ROUTING
    ============================================================ */
 const NAV = {
-  hr:      [['jobs','Job posts'],['availability','Panel availability'],['schedule','Schedule interview'],['interviews','Interviews'],['team','Team & managers']],
-  panel:   [['openjobs','Open roles'],['myavail','My availability'],['myinterviews','My interviews'],['feedback','Give feedback']],
-  manager: [['approvals','Job approvals'],['offers','Offer approvals'],['reports','Reports']]
+  hr:      [['jobs','Job posts'],['availability','Panel availability'],['schedule','Schedule interview'],['interviews','Interviews'],['team','Team & managers'],['addmember','Add team member'],['profile','My profile']],
+  panel:   [['openjobs','Open roles'],['myavail','My availability'],['myinterviews','My interviews'],['feedback','Give feedback'],['profile','My profile']],
+  manager: [['approvals','Job approvals'],['offers','Offer approvals'],['reports','Reports'],['addmember','Add team member'],['profile','My profile']]
+};
+const NAV_ICONS = {
+  jobs:'&#128188;', availability:'&#128197;', schedule:'&#128198;', interviews:'&#128172;', team:'&#128101;',
+  addmember:'&#10133;', profile:'&#9881;', openjobs:'&#128269;', myavail:'&#128197;', myinterviews:'&#128172;',
+  feedback:'&#128221;', approvals:'&#9989;', offers:'&#127942;', reports:'&#128202;'
 };
 window.route = async function(key){
-  document.querySelectorAll('.rail-nav button').forEach(b=>b.classList.toggle('active', b.dataset.key===key));
+  document.querySelectorAll('.rail-nav button, .mobile-nav button').forEach(b=>b.classList.toggle('active', b.dataset.key===key));
   await loadAll();
   const r = {
     jobs:renderHRJobs, availability:renderHRAvailability, schedule:renderHRSchedule, interviews:renderHRInterviews, team:renderHRTeam,
     openjobs:renderPanelOpenJobs, myavail:renderPanelMyAvail, myinterviews:renderPanelInterviews, feedback:renderPanelFeedback,
-    approvals:renderMgrApprovals, offers:renderMgrOffers, reports:renderMgrReports
+    approvals:renderMgrApprovals, offers:renderMgrOffers, reports:renderMgrReports,
+    addmember:renderAddMember, profile:renderProfile
   };
   r[key]();
 };
 async function enterApp(){
   document.getElementById('who-name').textContent = session.name;
-  const b = document.getElementById('who-badge');
-  b.textContent = session.role==='hr'?'HR':session.role==='panel'?'Panel Member':'Manager';
-  b.className = 'badge ' + (session.role==='hr'?'hr':session.role==='panel'?'panel':'mgr');
+  document.getElementById('mt-name').textContent = session.name;
+  const roleLabel = session.role==='hr'?'HR':session.role==='panel'?'Panel Member':'Manager';
+  const roleClass = session.role==='hr'?'hr':session.role==='panel'?'panel':'mgr';
+  const b = document.getElementById('who-badge'); b.textContent = roleLabel; b.className = 'badge ' + roleClass;
+  const mb = document.getElementById('mt-badge'); mb.textContent = roleLabel; mb.className = 'badge ' + roleClass;
   const nav = document.getElementById('rail-nav'); nav.innerHTML='';
+  const mnav = document.getElementById('mobile-nav'); mnav.innerHTML='';
   NAV[session.role].forEach(([key,label])=>{
-    const btn=document.createElement('button'); btn.textContent=label; btn.dataset.key=key;
+    const btn=document.createElement('button'); btn.dataset.key=key;
+    btn.innerHTML = `<span class="ic">${NAV_ICONS[key]||''}</span>${label}`;
     btn.onclick=()=>window.route(key); nav.appendChild(btn);
+    const mbtn=document.createElement('button'); mbtn.textContent=label; mbtn.dataset.key=key;
+    mbtn.onclick=()=>window.route(key); mnav.appendChild(mbtn);
   });
   await window.route(NAV[session.role][0][0]);
 }
@@ -415,7 +459,7 @@ function renderHRJobs(){
       ${!managers.length ? `<div class="row-empty">No Manager accounts exist yet — have a manager sign up before you can route approvals.</div>` : `
       <div class="form-grid">
         <div><label>Job title</label><input id="jf-title" placeholder="e.g. Backend Engineer"></div>
-        <div><label>Department</label><input id="jf-dept" placeholder="e.g. Engineering"></div>
+        <div><label>Department</label><select id="jf-dept">${DEPARTMENTS.map(d=>`<option>${d}</option>`).join('')}</select></div>
         <div><label>Tech stack</label><select id="jf-tech">${TECH_STACKS.map(t=>`<option>${t}</option>`).join('')}</select></div>
         <div><label>Approving manager</label><select id="jf-mgr">${managers.map(m=>`<option value="${m.uid}">${esc(m.name)}</option>`).join('')}</select></div>
         <div class="full"><label>Description</label><textarea id="jf-desc" placeholder="What the role covers, level, key skills..."></textarea></div>
@@ -586,7 +630,17 @@ function renderHRTeam(){
   const people = allUsers.filter(u=>u.role==='hr'||u.role==='panel');
   const managers = allUsers.filter(u=>u.role==='manager');
   document.getElementById('main').innerHTML = `
-    ${pageHead('Team & managers','Assign each person\u2019s manager, and manage the tech stack list.')}
+    ${pageHead('Team & managers','Assign each person\u2019s manager, and manage tech stacks & departments.')}
+    <div class="panel-box">
+      <div class="panel-box-head"><h3>Departments</h3></div>
+      <div style="padding:16px 18px;">
+        <div style="margin-bottom:12px;">${DEPARTMENTS.map(d=>`<span class="chip">${esc(d)} <button onclick="removeDept('${esc(d)}')" style="background:none;border:none;color:var(--danger);cursor:pointer;">✕</button></span>`).join('')}</div>
+        <div style="display:flex;gap:8px;">
+          <input type="text" id="new-dept" placeholder="e.g. Engineering, Sales..." style="flex:1;padding:9px 10px;border:1px solid var(--hairline-strong);">
+          <button class="btn-sm" onclick="addDept()">Add</button>
+        </div>
+      </div>
+    </div>
     <div class="panel-box">
       <div class="panel-box-head"><h3>Tech stacks</h3></div>
       <div style="padding:16px 18px;">
@@ -602,7 +656,7 @@ function renderHRTeam(){
         <div class="row-item">
           <div>
             <div class="row-title">${esc(p.name)} <span class="badge ${p.role==='hr'?'hr':'panel'}" style="margin-left:6px;">${p.role==='hr'?'HR':'Panel'}</span></div>
-            <div class="row-sub">${esc(p.email)}</div>
+            <div class="row-sub">${esc(p.email)} · ${esc(p.department||'No department set')}</div>
             ${p.role==='panel' ? `<div style="margin-top:6px;">${(p.techStacks||[]).map(t=>`<span class="chip">${esc(t)}</span>`).join('') || '<span class="mini-label">No tech stack set</span>'}</div>` : ''}
           </div>
           <div>
@@ -615,6 +669,19 @@ function renderHRTeam(){
         </div>`).join('') : `<div class="row-empty">No HR or Panel accounts yet.</div>`
     }</div></div>`;
 }
+window.addDept = async function(){
+  const val = document.getElementById('new-dept').value.trim();
+  if(!val) return showToast('Type a department name.');
+  if(DEPARTMENTS.includes(val)) return showToast('That department already exists.');
+  DEPARTMENTS = [...DEPARTMENTS, val];
+  await setDoc(doc(db,'config','departments'), { list: DEPARTMENTS }, { merge:true });
+  showToast('Department added.'); window.route('team');
+};
+window.removeDept = async function(val){
+  DEPARTMENTS = DEPARTMENTS.filter(d=>d!==val);
+  await setDoc(doc(db,'config','departments'), { list: DEPARTMENTS }, { merge:true });
+  showToast('Department removed.'); window.route('team');
+};
 window.addTechStack = async function(){
   const val = document.getElementById('new-tech').value.trim();
   if(!val) return showToast('Type a tech stack name.');
@@ -807,6 +874,96 @@ function renderMgrReports(){
       }).join('') : `<div class="row-empty">No interviews yet.</div>`
     }</div></div>`;
 }
+
+/* ============================================================
+   MY PROFILE (all roles)
+   ============================================================ */
+function renderProfile(){
+  const mgr = session.managerUid ? userByUid(session.managerUid) : null;
+  document.getElementById('main').innerHTML = `
+    ${pageHead('My profile','Keep your details up to date.')}
+    <div class="panel-box">
+      <div class="form-grid">
+        <div><label>Full name</label><input id="pf-name" value="${esc(session.name)}"></div>
+        <div><label>Email</label><input value="${esc(session.email)}" disabled style="opacity:0.6;"></div>
+        <div><label>Role</label><input value="${session.role==='hr'?'HR':session.role==='panel'?'Panel Member':'Manager'}" disabled style="opacity:0.6;"></div>
+        <div><label>Department</label><select id="pf-dept">${DEPARTMENTS.map(d=>`<option ${d===session.department?'selected':''}>${esc(d)}</option>`).join('')}</select></div>
+        <div class="full"><label>Manager</label><input value="${mgr?esc(mgr.name):'Not yet assigned by HR'}" disabled style="opacity:0.6;"></div>
+        ${session.role==='panel' ? `<div class="full"><label>Tech stack(s)</label>
+          <div class="chk-grid">${TECH_STACKS.map(t=>`<label class="chk-opt"><input type="checkbox" value="${t}" class="pf-ts" ${session.techStacks.includes(t)?'checked':''}> ${t}</label>`).join('')}</div>
+        </div>` : ''}
+      </div>
+      <div class="form-foot"><span></span><button class="btn-sm solid" onclick="saveProfile()">Save changes</button></div>
+    </div>`;
+}
+window.saveProfile = async function(){
+  const name = document.getElementById('pf-name').value.trim();
+  const department = document.getElementById('pf-dept').value;
+  if(!name) return showToast('Name can\'t be empty.');
+  const update = { name, department };
+  if(session.role==='panel'){
+    const techStacks = Array.from(document.querySelectorAll('.pf-ts:checked')).map(c=>c.value);
+    if(!techStacks.length) return showToast('Select at least one tech stack.');
+    update.techStacks = techStacks;
+  }
+  await updateDoc(doc(db,'users',session.uid), update);
+  Object.assign(session, update);
+  document.getElementById('who-name').textContent = session.name;
+  document.getElementById('mt-name').textContent = session.name;
+  showToast('Profile updated.'); window.route('profile');
+};
+
+/* ============================================================
+   ADD TEAM MEMBER (HR & Manager)
+   ============================================================ */
+let addMemberRole = 'panel';
+window.pickAddRole = function(r){
+  addMemberRole = r;
+  document.querySelectorAll('.am-role-opt').forEach(el=>el.classList.toggle('active', el.dataset.role===r));
+  document.getElementById('am-techstack-field').style.display = r==='panel' ? 'block' : 'none';
+};
+function renderAddMember(){
+  addMemberRole = 'panel';
+  document.getElementById('main').innerHTML = `
+    ${pageHead('Add team member','Create an account directly — share the temporary password with them so they can sign in and set their own later via My Profile.')}
+    <div class="panel-box">
+      <div class="form-grid">
+        <div><label>Full name</label><input id="am-name" placeholder="Jane Doe"></div>
+        <div><label>Company email</label><input id="am-email" placeholder="jane@company.com"></div>
+        <div><label>Temporary password</label><input id="am-pass" value="${Math.random().toString(36).slice(2,10)}Aa1"></div>
+        <div><label>Department</label><select id="am-dept">${DEPARTMENTS.map(d=>`<option>${d}</option>`).join('')}</select></div>
+        <div class="full">
+          <label>Role</label>
+          <div class="role-pick">
+            <div class="role-opt am-role-opt" data-role="hr" onclick="pickAddRole('hr')">HR</div>
+            <div class="role-opt am-role-opt active" data-role="panel" onclick="pickAddRole('panel')">Panel</div>
+            <div class="role-opt am-role-opt" data-role="manager" onclick="pickAddRole('manager')">Manager</div>
+          </div>
+        </div>
+        <div class="full" id="am-techstack-field">
+          <label>Tech stack(s)</label>
+          <div class="chk-grid">${TECH_STACKS.map(t=>`<label class="chk-opt"><input type="checkbox" value="${t}" class="am-ts"> ${t}</label>`).join('')}</div>
+        </div>
+      </div>
+      <div class="form-foot"><span></span><button class="btn-sm solid" onclick="createMember()">Create account</button></div>
+    </div>`;
+}
+window.createMember = async function(){
+  const name = document.getElementById('am-name').value.trim();
+  const email = document.getElementById('am-email').value.trim().toLowerCase();
+  const pass = document.getElementById('am-pass').value;
+  const department = document.getElementById('am-dept').value;
+  const techStacks = addMemberRole==='panel' ? Array.from(document.querySelectorAll('.am-ts:checked')).map(c=>c.value) : [];
+  if(!name || !email || !pass) return showToast('Fill in name, email and password.');
+  if(addMemberRole==='panel' && !techStacks.length) return showToast('Select at least one tech stack.');
+  try{
+    const cred = await createUserWithEmailAndPassword(secondaryAuth, email, pass);
+    await setDoc(doc(db,'users',cred.user.uid), { name, email, role:addMemberRole, managerUid:session.role==='manager'?session.uid:null, techStacks, department });
+    await signOut(secondaryAuth);
+    showToast(`Account created. Share the password "${pass}" with ${name}.`);
+    window.route('addmember');
+  }catch(err){ showToast(friendlyAuthError(err)); }
+};
 </script>
 </body>
 </html>
