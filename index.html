@@ -225,7 +225,22 @@ async function sendNotification(toEmail, toName, subject, message){
   }catch(e){ console.error('Email send failed', e); }
 }
 
-const TECH_STACKS = ['Backend','Frontend','Fullstack','Data/ML','QA','DevOps','Mobile','Other'];
+let TECH_STACKS = ['Salesforce','SAP','Java','DevOps','QA Functional','QA Automation','React JS'];
+
+async function loadTechStacksPublic(){
+  try{
+    const snap = await getDoc(doc(db,'config','techstacks'));
+    if(snap.exists() && Array.isArray(snap.data().list) && snap.data().list.length){
+      TECH_STACKS = snap.data().list;
+    }
+  }catch(e){ /* fall back to defaults above if the doc doesn't exist yet or read fails */ }
+  renderTechstackChecks();
+}
+function renderTechstackChecks(){
+  document.getElementById('techstack-checks').innerHTML = TECH_STACKS.map(t=>`
+    <label class="chk-opt"><input type="checkbox" value="${t}" class="ts-check"> ${t}</label>`).join('');
+}
+loadTechStacksPublic();
 
 let session = null;
 let signupRole = 'hr';
@@ -262,9 +277,6 @@ window.pickRole = function(r){
   document.querySelectorAll('.role-opt').forEach(el=>el.classList.toggle('active', el.dataset.role===r));
   document.getElementById('techstack-field').style.display = r==='panel' ? 'block' : 'none';
 };
-document.getElementById('techstack-checks').innerHTML = TECH_STACKS.map(t=>`
-  <label class="chk-opt"><input type="checkbox" value="${t}" class="ts-check"> ${t}</label>`).join('');
-
 window.toggleAuth = function(which){
   document.getElementById('auth-error').style.display='none';
   document.getElementById('signin-form').style.display = which==='signin' ? 'block':'none';
@@ -333,6 +345,10 @@ async function loadAll(){
     getDocs(collection(db,'users')), getDocs(collection(db,'jobs')),
     getDocs(collection(db,'availability')), getDocs(collection(db,'interviews')),
   ]);
+  try{
+    const tsSnap = await getDoc(doc(db,'config','techstacks'));
+    if(tsSnap.exists() && Array.isArray(tsSnap.data().list) && tsSnap.data().list.length) TECH_STACKS = tsSnap.data().list;
+  }catch(e){ /* keep current TECH_STACKS on failure */ }
   allUsers = usersSnap.docs.map(d=>({uid:d.id, ...d.data()}));
   allJobs = jobsSnap.docs.map(d=>({id:d.id, ...d.data()}));
   allAvailability = availSnap.docs.map(d=>({id:d.id, ...d.data()})).filter(a=>!a.removed);
@@ -570,7 +586,17 @@ function renderHRTeam(){
   const people = allUsers.filter(u=>u.role==='hr'||u.role==='panel');
   const managers = allUsers.filter(u=>u.role==='manager');
   document.getElementById('main').innerHTML = `
-    ${pageHead('Team & managers','Assign each person\u2019s manager. Panel tech stacks are set by them at sign-up.')}
+    ${pageHead('Team & managers','Assign each person\u2019s manager, and manage the tech stack list.')}
+    <div class="panel-box">
+      <div class="panel-box-head"><h3>Tech stacks</h3></div>
+      <div style="padding:16px 18px;">
+        <div style="margin-bottom:12px;">${TECH_STACKS.map(t=>`<span class="chip">${esc(t)} <button onclick="removeTechStack('${esc(t)}')" style="background:none;border:none;color:var(--danger);cursor:pointer;">✕</button></span>`).join('')}</div>
+        <div style="display:flex;gap:8px;">
+          <input type="text" id="new-tech" placeholder="e.g. Salesforce, SAP, Java..." style="flex:1;padding:9px 10px;border:1px solid var(--hairline-strong);">
+          <button class="btn-sm" onclick="addTechStack()">Add</button>
+        </div>
+      </div>
+    </div>
     <div class="panel-box"><div>${
       people.length ? people.map(p=>`
         <div class="row-item">
@@ -589,6 +615,19 @@ function renderHRTeam(){
         </div>`).join('') : `<div class="row-empty">No HR or Panel accounts yet.</div>`
     }</div></div>`;
 }
+window.addTechStack = async function(){
+  const val = document.getElementById('new-tech').value.trim();
+  if(!val) return showToast('Type a tech stack name.');
+  if(TECH_STACKS.includes(val)) return showToast('That tech stack already exists.');
+  TECH_STACKS = [...TECH_STACKS, val];
+  await setDoc(doc(db,'config','techstacks'), { list: TECH_STACKS }, { merge:true });
+  showToast('Tech stack added.'); window.route('team');
+};
+window.removeTechStack = async function(val){
+  TECH_STACKS = TECH_STACKS.filter(t=>t!==val);
+  await setDoc(doc(db,'config','techstacks'), { list: TECH_STACKS }, { merge:true });
+  showToast('Tech stack removed.'); window.route('team');
+};
 window.assignManager = async function(uid, managerUid){
   await updateDoc(doc(db,'users',uid), { managerUid: managerUid || null });
   showToast('Manager updated.'); window.route('team');
